@@ -1,6 +1,7 @@
 package v10.math;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class MathUtils {
 
@@ -59,6 +60,348 @@ public class MathUtils {
 		Vec3 d0 = new Vec3(t0, t1);
 		Vec3 d1 = new Vec3(t0, t2);
 		return d0.cross(d1).normalize();
+	}
+
+	/**
+	 * Calculates determinant of 3 vectors
+	 * 
+	 * Could be useful when determining if a right or left turn occurred at vector b. 
+	 * 
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @return
+	 */
+
+	public static float determinant(Vec2 a, Vec2 b, Vec2 c) {
+		return (b.x - a.x) * (c.y - b.y) - (c.x - b.x) * (b.y - a.y);
+	}
+
+	/**
+	 * Returns true if polygon is wound counterclockwise
+	 * 
+	 * @param points
+	 * @return
+	 */
+
+	public static boolean isCounterClockwiseWinding(ArrayList<Vec2> points) {
+		float sum = 0;
+		for (int i = 0; i < points.size(); i++) {
+			Vec2 a = points.get(i);
+			Vec2 b = points.get((i + 1) % points.size());
+			Vec2 c = points.get((i + 2) % points.size());
+			float det = determinant(a, b, c);
+			sum += det;
+		}
+		return sum > 0;
+	}
+
+	/**
+	 * Returns true if the polygon is convex
+	 * 
+	 * @param points
+	 * @return
+	 */
+
+	public static boolean isConvex(ArrayList<Vec2> points) {
+		boolean clockwise = !isCounterClockwiseWinding(points);
+		for (int i = 0; i < points.size(); i++) {
+			Vec2 a = points.get(i);
+			Vec2 b = points.get((i + 1) % points.size());
+			Vec2 c = points.get((i + 2) % points.size());
+			float det = determinant(a, b, c);
+			if (det < 0 ^ clockwise) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Wrapper method to calculate convex hull
+	 * 
+	 * @param verts
+	 * @return
+	 */
+
+	public static ArrayList<Vec2> calculateConvexHull(ArrayList<Vec2> verts) {
+		Vec2[] v = Vec2.arrayOf(verts.size());
+		for (int i = 0; i < verts.size(); i++) {
+			v[i].set(verts.get(i));
+		}
+		Vec2[] ans = calculateConvexHull(v);
+		ArrayList<Vec2> ret = new ArrayList<>();
+		for (int i = 0; i < ans.length; i++) {
+			ret.add(ans[i]);
+		}
+		return ret;
+	}
+
+	/**
+	 * Given a list of points, will calculate convex hull
+	 * 
+	 * @param verts
+	 * @return
+	 */
+
+	public static Vec2[] calculateConvexHull(Vec2[] verts) {
+		// Find the right most point on the hull
+		int rightMost = 0;
+		int vertexCount = 0;
+		double highestXCoord = verts[0].x;
+		for (int i = 1; i < verts.length; ++i) {
+			double x = verts[i].x;
+
+			if (x > highestXCoord) {
+				highestXCoord = x;
+				rightMost = i;
+			}
+			// If matching x then take farthest negative y
+			else if (x == highestXCoord) {
+				if (verts[i].y < verts[rightMost].y) {
+					rightMost = i;
+				}
+			}
+		}
+
+		int[] hull = new int[verts.length];
+		int outCount = 0;
+		int indexHull = rightMost;
+
+		for (;;) {
+			hull[outCount] = indexHull;
+
+			// Search for next index that wraps around the hull
+			// by computing cross products to find the most counter-clockwise
+			// vertex in the set, given the previos hull index
+			int nextHullIndex = 0;
+			for (int i = 1; i < verts.length; ++i) {
+				// Skip if same coordinate as we need three unique
+				// points in the set to perform a cross product
+				if (nextHullIndex == indexHull) {
+					nextHullIndex = i;
+					continue;
+				}
+
+				// Cross every set of three unique vertices
+				// Record each counter clockwise third vertex and add
+				// to the output hull
+				// See : http://www.oocities.org/pcgpe/math2d.html
+				Vec2 e1 = verts[nextHullIndex].sub(verts[hull[outCount]]);
+				Vec2 e2 = verts[i].sub(verts[hull[outCount]]);
+				double c = Vec2.cross(e1, e2);
+				if (c < 0.0f) {
+					nextHullIndex = i;
+				}
+
+				// Cross product is zero then e vectors are on same line
+				// therefore want to record vertex farthest along that line
+				if (c == 0.0f && e2.lengthSq() > e1.lengthSq()) {
+					nextHullIndex = i;
+				}
+			}
+
+			++outCount;
+			indexHull = nextHullIndex;
+
+			// Conclude algorithm upon wrap-around
+			if (nextHullIndex == rightMost) {
+				vertexCount = outCount;
+				break;
+			}
+		}
+
+		Vec2[] ans = Vec2.arrayOf(vertexCount);
+
+		// Copy vertices into shape's vertices
+		for (int i = 0; i < vertexCount; ++i) {
+			ans[i].set(verts[hull[i]]);
+		}
+
+		return ans;
+	}
+
+	/**
+	 * Takes in a simple polygon, and returns n concave polygons, where the union of the n polygons is equal to
+	 * the original polygon.
+	 * 
+	 * n is at most 4 times the optimal amount of concave polygons. 
+	 * 
+	 * Additionally, all of the vertices of the concave polygons will belong to the original polygon, meaning no
+	 * additional points are added. 
+	 * 
+	 * Complexity: O(n^3)
+	 * 
+	 * @param points
+	 * @return
+	 */
+
+	public static ArrayList<int[]> calculateConcavePartition(ArrayList<Vec2> points) {
+		ArrayList<int[]> ans = new ArrayList<>();
+		ArrayList<int[]> tri = calculateTrianglePartition(points);
+		boolean[] v = new boolean[tri.size()];
+
+		for (int i = 0; i < tri.size(); i++) {
+			if (v[i]) {
+				continue;
+			}
+
+			HashSet<Integer> vSet = new HashSet<>();
+			vSet.add(tri.get(i)[0]);
+			vSet.add(tri.get(i)[1]);
+			vSet.add(tri.get(i)[2]);
+
+			ArrayList<Integer> vList = new ArrayList<>();
+			vList.add(tri.get(i)[0]);
+			vList.add(tri.get(i)[1]);
+			vList.add(tri.get(i)[2]);
+
+			v[i] = true;
+
+			//greedily try to add on triangles
+			for (int j = i + 1; j < tri.size(); j++) {
+				if (v[j]) {
+					continue;
+				}
+
+				int[] next = tri.get(j);
+
+				//if 2 of the 3 vertices in the next triangle belong to the current one, then we can add it. 
+				int sum = 0;
+				sum += vSet.contains(next[0]) ? 1 : 0;
+				sum += vSet.contains(next[1]) ? 1 : 0;
+				sum += vSet.contains(next[2]) ? 1 : 0;
+
+				if (sum != 2) { //next triangle is not adjacent
+					continue;
+				}
+
+				int vNotContained = -1;
+				if (!vSet.contains(next[0])) {
+					vNotContained = next[0];
+				}
+				if (!vSet.contains(next[1])) {
+					vNotContained = next[1];
+				}
+				if (!vSet.contains(next[2])) {
+					vNotContained = next[2];
+				}
+
+				//construct new list of vertices to check whether it is convex
+				ArrayList<Integer> nextVList = new ArrayList<>();
+				int startInd = 0;
+				for (int k = 0; k < vList.size(); k++) {
+					if (!(vList.get(k) == next[0] || vList.get(k) == next[1] || vList.get(k) == next[2])) {
+						startInd = k;
+						break;
+					}
+				}
+				for (int k = 0; k < vList.size(); k++) {
+					nextVList.add(vList.get((k + startInd) % vList.size()));
+				}
+				for (int k = 0; k < nextVList.size(); k++) {
+					if (!(nextVList.get(k) == next[0] || nextVList.get(k) == next[1] || nextVList.get(k) == next[2])) {
+						continue;
+					}
+					nextVList.add(k + 1, vNotContained);
+					break;
+				}
+
+				ArrayList<Vec2> tmp = new ArrayList<>();
+				for (int k = 0; k < nextVList.size(); k++) {
+					tmp.add(points.get(nextVList.get(k)));
+				}
+
+				if (!MathUtils.isConvex(tmp)) {
+					continue;
+				}
+
+				//save new vertex list
+				vList = nextVList;
+				vSet.add(vNotContained);
+				v[j] = true;
+			}
+
+			//save answer
+			int[] next = new int[vList.size()];
+			for (int j = 0; j < vList.size(); j++) {
+				next[j] = vList.get(j);
+			}
+
+			ans.add(next);
+		}
+
+		return ans;
+	}
+
+	/**
+	 * Takes in a simple polygon, and returns n - 2 triangles, where n is the amount of vertices. 
+	 * The union of the triangles is equal to the original polygon
+	 * 
+	 * Uses ear clipping technique
+	 * 
+	 * try not to have 3 adjacent colinear points in the input polygon or else a degenerate triangle
+	 * will be produced
+	 * 
+	 * Complexity: O(n^2)
+	 * 
+	 * @param points
+	 * @return
+	 */
+
+	public static ArrayList<int[]> calculateTrianglePartition(ArrayList<Vec2> points) {
+		boolean clockwise = !MathUtils.isCounterClockwiseWinding(points);
+		int n = points.size();
+		ArrayList<int[]> ans = new ArrayList<>();
+		boolean[] v = new boolean[n];
+		while (ans.size() != n - 2) {
+			int[] next = new int[3];
+
+			//look for next triangle to remove
+			//im assuming there's at least one valid triangle for us to remove
+			outer:
+			for (int i = 0; i < n; i++) {
+				if (v[i]) {
+					continue;
+				}
+
+				next[0] = i;
+				for (int j = i + 1;; j++) {
+					if (!v[j % n]) {
+						next[1] = j % n;
+						break;
+					}
+				}
+				for (int j = next[1] + 1;; j++) {
+					if (!v[j % n]) {
+						next[2] = j % n;
+						break;
+					}
+				}
+
+				//if angle is not acute, then it's not a triangle
+				if (MathUtils.determinant(points.get(next[0]), points.get(next[1]), points.get(next[2])) < 0 ^ clockwise) {
+					continue;
+				}
+
+				//if any of the vertices are inside the triangle, then it is invalid
+				for (int j = 0; j < n; j++) {
+					if (j == next[0] || j == next[1] || j == next[2]) {
+						continue;
+					}
+					if (MathUtils.pointInsideTriangle(points.get(j), points.get(next[0]), points.get(next[1]), points.get(next[2]))) {
+						continue outer;
+					}
+				}
+
+				v[next[1]] = true;
+				break;
+			}
+
+			ans.add(next);
+		}
+
+		return ans;
 	}
 
 	/**
@@ -344,6 +687,25 @@ public class MathUtils {
 	}
 
 	/**
+	 * Take in a point and a triangle, and returns true if the point is contained within the triangle. 
+	 * 
+	 * @param point
+	 * @param t0
+	 * @param t1
+	 * @param t2
+	 * @return
+	 */
+
+	public static boolean pointInsideTriangle(Vec2 point, Vec2 t0, Vec2 t1, Vec2 t2) {
+		Vec2 centroid = new Vec2((t0.x + t1.x + t2.x) / 3.0, (t0.y + t1.y + t2.y) / 3.0);
+		boolean ans = true;
+		ans &= pointsOnSameSideOfLine(t0, new Vec2(t0, t1), centroid, point);
+		ans &= pointsOnSameSideOfLine(t1, new Vec2(t1, t2), centroid, point);
+		ans &= pointsOnSameSideOfLine(t2, new Vec2(t2, t0), centroid, point);
+		return ans;
+	}
+
+	/**
 	 * Take in a ray and a triangle, and returns the intersection if it exists.
 	 * 
 	 * @param ray_origin
@@ -621,12 +983,7 @@ public class MathUtils {
 		float d1 = perpendicular.dot(v1);
 		float d2 = perpendicular.dot(v2);
 
-		if (d1 * d2 >= 0) {
-			return true;
-		}
-
-		return false;
-
+		return d1 * d2 >= 0;
 	}
 
 	/**
