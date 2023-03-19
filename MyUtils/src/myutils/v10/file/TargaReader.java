@@ -1,4 +1,4 @@
-package v10.file;
+package myutils.v10.file;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;

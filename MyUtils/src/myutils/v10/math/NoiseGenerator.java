@@ -1,9 +1,7 @@
-package v10.math;
+package myutils.v10.math;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 public class NoiseGenerator {
 

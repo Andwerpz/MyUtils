@@ -1,4 +1,4 @@
-package v10.misc;
+package myutils.v10.misc;
 
 public class Triple<T1, T2, T3> {
 

@@ -19,7 +19,7 @@
     Port to Java by Philip Diffenderfer http://magnos.org
 */
 
-package v10.math;
+package myutils.v10.math;
 
 public class Mat2 {
 

@@ -1,4 +1,4 @@
-package v10.networking;
+package myutils.v10.networking;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

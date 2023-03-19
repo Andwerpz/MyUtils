@@ -1,6 +1,4 @@
-package v10.math;
-
-import java.nio.FloatBuffer;
+package myutils.v10.math;
 
 public class Vec4 {
 

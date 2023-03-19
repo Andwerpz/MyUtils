@@ -1,12 +1,11 @@
-package v10.graphics;
+package myutils.v10.graphics;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import v10.file.FileUtils;
+import myutils.v10.file.FileUtils;
 
 public class FontUtils {
 

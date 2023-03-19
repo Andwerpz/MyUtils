@@ -1,4 +1,4 @@
-package v10.math;
+package myutils.v10.math;
 
 public class Vec2 {
 

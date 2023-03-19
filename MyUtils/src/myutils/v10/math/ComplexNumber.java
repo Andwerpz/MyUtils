@@ -1,4 +1,4 @@
-package v10.math;
+package myutils.v10.math;
 
 /**
  * <code>ComplexNumber</code> is a class which implements complex numbers in

@@ -1,4 +1,4 @@
-package v10.graphics;
+package myutils.v10.graphics;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -12,16 +12,9 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.RescaleOp;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-
-import v10.file.FileUtils;
+import myutils.v10.file.FileUtils;
 
 public class GraphicsTools {
 
