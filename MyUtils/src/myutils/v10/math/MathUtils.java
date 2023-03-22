@@ -118,6 +118,47 @@ public class MathUtils {
 	}
 
 	/**
+	 * Returns true if the given points form into a simple polygon
+	 * 
+	 * A simple polygon is a polygon that does not intersect itself and does not have any holes. 
+	 * 
+	 * TODO implement O(nlogn) with sweep line
+	 * 	- Sort the endpoints according to their x component
+	 *  - For each point, keep track of whether it is a left endpoint or right endpoint for it's line
+	 *  - For each point, if it is a left endpoint, add the corresponding line to a bst, else remove the line. 
+	 *  - Each time we add a new line, check for intersections against the lines right above and below it. 
+	 * TODO figure out a way to remove epsilon
+	 * 
+	 * @param points
+	 * @return
+	 */
+
+	public static boolean isSimplePolygon(ArrayList<Vec2> points) {
+		float epsilon = 0.01f;
+
+		for (int i = 0; i < points.size() - 1; i++) {
+			Vec2 u = new Vec2(points.get(i));
+			Vec2 v = new Vec2(points.get(i + 1));
+			u.addi(new Vec2(u, v).mul(epsilon));
+			v.addi(new Vec2(v, u).mul(epsilon));
+
+			for (int j = i + 2; j < points.size(); j++) {
+				Vec2 a = new Vec2(points.get(j));
+				Vec2 b = new Vec2(points.get((j + 1) % points.size()));
+				a.addi(new Vec2(a, b).mul(epsilon));
+				b.addi(new Vec2(b, a).mul(epsilon));
+
+				if (lineSegment_lineSegmentIntersect(a, b, u, v) != null) {
+					//one line crosses another line
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Wrapper method to calculate convex hull
 	 * 
 	 * @param verts
