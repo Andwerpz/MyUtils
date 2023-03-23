@@ -11,6 +11,8 @@ import javax.imageio.ImageIO;
 
 public class FileUtils {
 
+	// NOTE: all filepaths should be relative to current working directory. 
+
 	public static String loadAsString(String file) {
 		StringBuilder result = new StringBuilder();
 		InputStream is;
@@ -69,6 +71,22 @@ public class FileUtils {
 	public static String removeFileExtension(String path) {
 		int lastPeriod = path.lastIndexOf('.');
 		return path.substring(0, lastPeriod);
+	}
+
+	public static File[] getAllFilesFromDirectory(String path) {
+		String directory = SystemUtils.getWorkingDirectory() + "\\res\\" + path;
+		File folder = new File(directory);
+		return folder.listFiles();
+	}
+
+	public static String[] getAllFilenamesFromDirectory(String path) {
+		File[] files = getAllFilesFromDirectory(path);
+		String[] names = new String[files.length];
+		for (int i = 0; i < names.length; i++) {
+			File f = files[i];
+			names[i] = f.getName();
+		}
+		return names;
 	}
 
 }

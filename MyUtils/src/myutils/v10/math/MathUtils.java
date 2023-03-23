@@ -159,6 +159,35 @@ public class MathUtils {
 	}
 
 	/**
+	 * Takes in a polygon and a point, and returns true if the point is within the polygon. 
+	 * 
+	 * TODO implement O(logn) version using bsearch
+	 * 
+	 * @param poly
+	 * @param p
+	 * @return
+	 */
+
+	public static boolean pointInsidePolygon(ArrayList<Vec2> poly, Vec2 p) {
+		//if a point is inside a polygon, then a ray drawn from the point must intersect the polygon an odd amount of times. 
+
+		Vec2 rayOrigin = new Vec2(p);
+		Vec2 rayDir = new Vec2(1, 0).rotate((float) (Math.random() * Math.PI * 2));
+
+		int cnt = 0;
+		for (int i = 0; i < poly.size(); i++) {
+			Vec2 a = poly.get(i);
+			Vec2 b = poly.get((i + 1) % poly.size());
+
+			if (MathUtils.ray_lineSegmentIntersect(rayOrigin, rayDir, a, b) != null) {
+				cnt++;
+			}
+		}
+
+		return cnt % 2 == 1;
+	}
+
+	/**
 	 * Wrapper method to calculate convex hull
 	 * 
 	 * @param verts
@@ -277,7 +306,7 @@ public class MathUtils {
 	 * @return
 	 */
 
-	public static ArrayList<int[]> calculateConcavePartition(ArrayList<Vec2> points) {
+	public static ArrayList<int[]> calculateConvexPartition(ArrayList<Vec2> points) {
 		ArrayList<int[]> ans = new ArrayList<>();
 		ArrayList<int[]> tri = calculateTrianglePartition(points);
 		boolean[] v = new boolean[tri.size()];
@@ -446,7 +475,9 @@ public class MathUtils {
 	}
 
 	/**
-	 * Takes in two line segments, and returns the point of intersection, if it exists. Null otherwise.
+	 * Takes in two lines, and returns their intersection points. 
+	 * 
+	 * Doesn't really handle paralell lines very well. 
 	 * 
 	 * @param a0
 	 * @param a1
@@ -454,7 +485,8 @@ public class MathUtils {
 	 * @param b1
 	 * @return
 	 */
-	public static Vec2 lineSegment_lineSegmentIntersect(Vec2 a0, Vec2 a1, Vec2 b0, Vec2 b1) {
+
+	public static Vec2 line_lineIntersect(Vec2 a0, Vec2 a1, Vec2 b0, Vec2 b1) {
 		float x1 = a0.x;
 		float x2 = a1.x;
 		float x3 = b0.x;
@@ -469,15 +501,93 @@ public class MathUtils {
 		float uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 		float uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 
-		// if uA and uB are between 0-1, lines are colliding
-		if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
-			// calculate the intersection point
-			float intersectionX = x1 + (uA * (x2 - x1));
-			float intersectionY = y1 + (uA * (y2 - y1));
-
-			return new Vec2(intersectionX, intersectionY);
+		if (uA == Float.NEGATIVE_INFINITY || uA == Float.POSITIVE_INFINITY) {
+			//the two lines are parallel
+			return null;
 		}
-		return null;
+
+		// calculate the intersection point
+		float intersectionX = x1 + (uA * (x2 - x1));
+		float intersectionY = y1 + (uA * (y2 - y1));
+
+		return new Vec2(intersectionX, intersectionY);
+	}
+
+	/**
+	 * Takes in two line segments, and returns the point of intersection, if it exists. Null otherwise.
+	 * 
+	 * @param a0
+	 * @param a1
+	 * @param b0
+	 * @param b1
+	 * @return
+	 */
+	public static Vec2 lineSegment_lineSegmentIntersect(Vec2 a0, Vec2 a1, Vec2 b0, Vec2 b1) {
+		//calculate intersection of line segments extended into lines
+		Vec2 lineIntersection = line_lineIntersect(a0, a1, b0, b1);
+
+		if (lineIntersection == null) {
+			return null;
+		}
+
+		//check if intersection point is along both of the line segments. 
+		{
+			Vec2 ai = new Vec2(a0, lineIntersection);
+			Vec2 da = new Vec2(a0, a1);
+			if (ai.dot(da) < 0) {
+				return null;
+			}
+			if (ai.lengthSq() > da.lengthSq()) {
+				return null;
+			}
+		}
+
+		{
+			Vec2 bi = new Vec2(b0, lineIntersection);
+			Vec2 db = new Vec2(b0, b1);
+			if (bi.dot(db) < 0) {
+				return null;
+			}
+			if (bi.lengthSq() > db.lengthSq()) {
+				return null;
+			}
+		}
+
+		return lineIntersection;
+	}
+
+	/**
+	 * Takes in a ray and a line segment, and returns the location of the intersection, if they intersect
+	 * Null if they don't intersect
+	 * 
+	 * @param ray_origin
+	 * @param ray_dir
+	 * @param b0
+	 * @param b1
+	 * @return
+	 */
+
+	public static Vec2 ray_lineSegmentIntersect(Vec2 ray_origin, Vec2 ray_dir, Vec2 b0, Vec2 b1) {
+		//calculate intersection of line segment and ray extended into lines
+		Vec2 lineIntersection = line_lineIntersect(ray_origin, ray_origin.add(ray_dir), b0, b1);
+
+		if (lineIntersection == null) {
+			return null;
+		}
+
+		//check if intersection point is along the line segment;
+		{
+			Vec2 bi = new Vec2(b0, lineIntersection);
+			Vec2 db = new Vec2(b0, b1);
+			if (bi.dot(db) < 0) {
+				return null;
+			}
+			if (bi.lengthSq() > db.lengthSq()) {
+				return null;
+			}
+		}
+
+		return lineIntersection;
 	}
 
 	/**
@@ -1033,7 +1143,7 @@ public class MathUtils {
 	 * @param points
 	 * @return
 	 */
-	public static Vec2 computeCentroid(ArrayList<Vec2> points) {
+	public static Vec2 calculateCentroid(ArrayList<Vec2> points) {
 		double accumulatedArea = 0.0f;
 		double centerX = 0.0f;
 		double centerY = 0.0f;

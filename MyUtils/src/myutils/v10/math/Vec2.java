@@ -271,8 +271,9 @@ public class Vec2 {
 
 	/**
 	 * Rotates this vector by the given radians.
+	 * @return 
 	 */
-	public void rotate(float radians) {
+	public Vec2 rotate(float radians) {
 		float c = (float) StrictMath.cos(radians);
 		float s = (float) StrictMath.sin(radians);
 
@@ -281,13 +282,15 @@ public class Vec2 {
 
 		x = xp;
 		y = yp;
+
+		return this;
 	}
 
 	/**
 	 * Normalizes this vector, making it a unit vector. A unit vector has a length
 	 * of 1.0.
 	 */
-	public void normalize() {
+	public Vec2 normalize() {
 		float lenSq = lengthSq();
 
 		if (lenSq > 0.000000001) {
@@ -295,6 +298,8 @@ public class Vec2 {
 			x *= invLen;
 			y *= invLen;
 		}
+
+		return this;
 	}
 
 	/**
