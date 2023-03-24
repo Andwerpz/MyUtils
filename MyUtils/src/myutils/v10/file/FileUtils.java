@@ -1,5 +1,7 @@
 package myutils.v10.file;
 
+import java.awt.Desktop;
+import java.awt.FileDialog;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,10 +10,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 public class FileUtils {
 
-	// NOTE: all filepaths should be relative to current working directory. 
+	// NOTE: all filepaths unless specified should be relative to current working directory. 
 
 	public static String loadAsString(String file) {
 		StringBuilder result = new StringBuilder();
@@ -87,6 +90,15 @@ public class FileUtils {
 			names[i] = f.getName();
 		}
 		return names;
+	}
+
+	public static File[] openFileExplorer() {
+		FileDialog fd = new FileDialog(new JFrame());
+		fd.setVisible(true);
+		File[] f = fd.getFiles();
+		fd.dispose();
+		fd.getOwner().dispose(); //have to do because some mem leak issues :shrug:
+		return f;
 	}
 
 }
