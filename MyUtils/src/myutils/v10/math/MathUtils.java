@@ -5,6 +5,8 @@ import java.util.HashSet;
 
 public class MathUtils {
 
+	public static final float EPSILON = 0.00001f;
+
 	// MathTools v2, made with LWGJL in mind
 
 	// -- GENERAL --
@@ -477,7 +479,7 @@ public class MathUtils {
 	/**
 	 * Takes in two lines, and returns their intersection points. 
 	 * 
-	 * Doesn't really handle paralell lines very well. 
+	 * Doesn't really handle parallel lines very well. 
 	 * 
 	 * @param a0
 	 * @param a1
@@ -506,6 +508,11 @@ public class MathUtils {
 			return null;
 		}
 
+		if (Float.isNaN(uA)) {
+			//two lines are the same line
+			return a0.add(new Vec2(a0, a1).mul(0.5f));
+		}
+
 		// calculate the intersection point
 		float intersectionX = x1 + (uA * (x2 - x1));
 		float intersectionY = y1 + (uA * (y2 - y1));
@@ -514,7 +521,71 @@ public class MathUtils {
 	}
 
 	/**
+	 * Takes in two lines, and returns true if they are the same line. 
+	 * 
+	 * @param a0
+	 * @param a1
+	 * @param b0
+	 * @param b1
+	 * @return
+	 */
+
+	public static boolean isSameLine(Vec2 a0, Vec2 a1, Vec2 b0, Vec2 b1) {
+		float x1 = a0.x;
+		float x2 = a1.x;
+		float x3 = b0.x;
+		float x4 = b1.x;
+
+		float y1 = a0.y;
+		float y2 = a1.y;
+		float y3 = b0.y;
+		float y4 = b1.y;
+
+		// calculate the distance to intersection point
+		float uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+		float uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+
+		return Float.isNaN(uA);
+	}
+
+	/**
+	 * Takes in a line segment and a point, and returns true if the point falls on the line segment
+	 * 
+	 * @param a0
+	 * @param a1
+	 * @param p
+	 * @return
+	 */
+
+	public static boolean isPointOnLineSegment(Vec2 a0, Vec2 a1, Vec2 p) {
+		Vec2 d1 = new Vec2(a0, a1);
+		Vec2 d2 = new Vec2(a0, p);
+
+		if (d1.lengthSq() < d2.lengthSq()) {
+			//p has to be farther away from a0 than a1.
+			return false;
+		}
+
+		d1.normalize();
+		d2.normalize();
+
+		if (Math.abs(1 - Vec2.dot(d1, d2)) > EPSILON) {
+			//p is not on the same line
+			return false;
+		}
+
+		if (Vec2.dot(d1, d2) < 0) {
+			//p is behind a0
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Takes in two line segments, and returns the point of intersection, if it exists. Null otherwise.
+	 * 
+	 * If the two line segments are the same, then returns 
 	 * 
 	 * @param a0
 	 * @param a1
@@ -523,6 +594,21 @@ public class MathUtils {
 	 * @return
 	 */
 	public static Vec2 lineSegment_lineSegmentIntersect(Vec2 a0, Vec2 a1, Vec2 b0, Vec2 b1) {
+		if (isSameLine(a0, a1, b0, b1)) {
+			//check both endpoints and midpoint
+			if (isPointOnLineSegment(a0, a1, b0)) {
+				return new Vec2(b0);
+			}
+			if (isPointOnLineSegment(a0, a1, b1)) {
+				return new Vec2(b1);
+			}
+			Vec2 mid = b0.add(new Vec2(b0, b1).mul(0.5f));
+			if (isPointOnLineSegment(a0, a1, mid)) {
+				return mid;
+			}
+			return null;
+		}
+
 		//calculate intersection of line segments extended into lines
 		Vec2 lineIntersection = line_lineIntersect(a0, a1, b0, b1);
 
