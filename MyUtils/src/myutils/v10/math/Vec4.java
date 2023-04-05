@@ -32,6 +32,13 @@ public class Vec4 {
 		this.w = a;
 	}
 
+	public void set(Vec4 v) {
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		this.w = v.w;
+	}
+
 	@Override
 	public String toString() {
 		return this.x + ", " + this.y + ", " + this.z + ", " + this.w;

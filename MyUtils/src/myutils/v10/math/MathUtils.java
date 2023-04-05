@@ -826,7 +826,7 @@ public class MathUtils {
 	 * @return
 	 */
 	public static Vec3 ray_planeIntersect(Vec3 ray_origin, Vec3 ray_dir, Vec3 plane_origin, Vec3 plane_normal) {
-		float ray_dirStepRatio = plane_normal.dot(ray_dir); // for each step in ray_dir, you go ray_dirStepRatio steps
+		float ray_dirStepRatio = plane_normal.dot(ray_dir); // for each step in ray_dir, you go ray_dirStepRatio steps towards the plane
 		// in plane_normal
 		if (ray_dirStepRatio == 0) {
 			// ray is parallel to plane, no intersection

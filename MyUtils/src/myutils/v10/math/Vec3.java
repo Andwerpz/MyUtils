@@ -116,6 +116,12 @@ public class Vec3 {
 		return this.x * a.x + this.y * a.y + this.z * a.z;
 	}
 
+	/**
+	 * this x a
+	 * @param a
+	 * @return
+	 */
+
 	public Vec3 cross(Vec3 a) {
 		Vec3 result = new Vec3(0);
 		result.x = this.y * a.z - this.z * a.y;
