@@ -17,6 +17,21 @@ import myutils.v10.file.SystemUtils;
 public class FileUtils {
 
 	// NOTE: all filepaths unless specified to be relative to the current working directory, should be from the root directory. 
+	// if it is relative, it's relative to the \res folder
+
+	public static File loadFile(String filepath) {
+		System.out.print("LOADING FILE: " + filepath);
+		File file = null;
+		file = new File(filepath);
+		System.out.println(" SUCCESS");
+
+		return file;
+	}
+
+	public static File loadFileRelative(String filepath) {
+		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res\\";
+		return loadFile(resDirectory + filepath);
+	}
 
 	public static String loadAsStringRelative(String file) {
 		StringBuilder result = new StringBuilder();
@@ -38,16 +53,13 @@ public class FileUtils {
 		return result.toString();
 	}
 
-	// loads img with filepath starting from root; C:
-	// assumes file is in /res folder
-	public static BufferedImage loadImageRelative(String filepath) {
-		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res\\";
+	public static BufferedImage loadImage(String filepath) {
 		BufferedImage img = null;
 
-		System.out.print("LOADING IMAGE: " + resDirectory + filepath);
+		System.out.print("LOADING IMAGE: " + filepath);
 
 		try {
-			img = ImageIO.read(new File(resDirectory + filepath));
+			img = ImageIO.read(new File(filepath));
 			System.out.println(" SUCCESS");
 		}
 		catch (IOException e) {
@@ -57,15 +69,9 @@ public class FileUtils {
 		return img;
 	}
 
-	public static File loadFileRelative(String filepath) {
+	public static BufferedImage loadImageRelative(String filepath) {
 		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res\\";
-
-		System.out.print("LOADING FILE: " + resDirectory + filepath);
-		File file = null;
-		file = new File(resDirectory + filepath);
-		System.out.println(" SUCCESS");
-
-		return file;
+		return loadImage(resDirectory + filepath);
 	}
 
 	public static String getFileExtension(String path) {
