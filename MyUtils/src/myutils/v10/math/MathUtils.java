@@ -33,22 +33,160 @@ public class MathUtils {
 	 * @param t3
 	 * @return
 	 */
-	public static float interpolate(float x1, float t1, float x2, float t2, float t3) {
+	public static float lerp(float x1, float t1, float x2, float t2, float t3) {
 		float v = (x2 - x1) / (t2 - t1);
 		return x1 + (t3 - t1) * v;
 	}
 
 	/**
-	 * Linearly interpolates between two vec3 points
-	 * 
-	 * @param 
+	 * Linear interpolation between two points
+	 * @param v1
+	 * @param t1
+	 * @param v2
+	 * @param t2
+	 * @param t3
+	 * @return
 	 */
-	public static Vec3 interpolate(Vec3 v1, float t1, Vec3 v2, float t2, float t3) {
+	public static Vec3 lerp(Vec3 v1, float t1, Vec3 v2, float t2, float t3) {
 		Vec3 v = (v2.sub(v1)).divi(t2 - t1);
 		return v1.add(v.mul(t3 - t1));
 	}
 
-	// -- LINEAR ALGEBRA --
+	/**
+	 * Spherical interpolation between two 3d points with t ranging between 0 and 1. 
+	 * @param v1
+	 * @param v2
+	 * @param t
+	 * @return
+	 */
+	public static Vec3 slerp(Vec3 v1, Vec3 v2, float t) {
+		Vec3 v1n = new Vec3(v1);
+		Vec3 v2n = new Vec3(v2);
+		v1n.normalize();
+		v2n.normalize();
+		float omega = (float) Math.acos(v1n.dot(v2n));
+
+		return v1.mul((float) (Math.sin((1 - t) * omega) / Math.sin(omega))).add(v2.mul((float) (Math.sin(t * omega) / Math.sin(omega))));
+	}
+
+	// -- QUATERNIONS --
+
+	/**
+	 * Creates the quaternion representing the rotation from vector u to v. 
+	 * @param u
+	 * @param v
+	 * @return
+	 */
+	public static Quaternion quaternionRotationUToV(Vec3 u, Vec3 v) {
+		Vec3 a = u.cross(v);
+		Quaternion ret = new Quaternion();
+		ret.s = (float) Math.sqrt(u.lengthSq() + v.lengthSq()) + u.dot(v);
+		ret.i = a.x;
+		ret.j = a.y;
+		ret.k = a.z;
+		ret.normalize();
+		return ret;
+	}
+
+	/**
+	 * Returns the quaternion describing a rotation of theta around the axis defined by the vector (x, y, z). 
+	 * 
+	 * Note that you need to do conjugation by the returned quaternion, that is if the returned quaternion is q, and
+	 * you want to rotate p by q, then you need to do qpq*, where q* is the conjugate of q. 
+	 * @param theta
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public static Quaternion quaternionRotationAxisAngle(float theta, float x, float y, float z) {
+		float c = (float) Math.cos(theta / 2);
+		float s = (float) Math.sin(theta / 2);
+		return new Quaternion(c, s * x, s * y, s * z);
+	}
+
+	/**
+	 * Returns the quaternion described by the rotation matrix
+	 * 
+	 * Source : https://d3cw3dd2w32x2b.cloudfront.net/wp-content/uploads/2015/01/matrix-to-quat.pdf
+	 * @param m
+	 * @return
+	 */
+	public static Quaternion quaternionFromRotationMat4(Mat4 a) {
+		Mat4 m = a.transpose(); //the article uses the matrix in column major
+		Quaternion q = null;
+		float t = 0;
+		if (m.mat[2][2] < 0) {
+			if (m.mat[0][0] > m.mat[1][1]) {
+				t = 1 + m.mat[0][0] - m.mat[1][1] - m.mat[2][2];
+				q = new Quaternion(t, m.mat[0][1] + m.mat[1][0], m.mat[2][0] + m.mat[0][2], m.mat[1][2] - m.mat[2][1]);
+			}
+			else {
+				t = 1 - m.mat[0][0] + m.mat[1][1] - m.mat[2][2];
+				q = new Quaternion(m.mat[0][1] + m.mat[1][0], t, m.mat[1][2] + m.mat[2][1], m.mat[2][0] - m.mat[0][2]);
+			}
+		}
+		else {
+			if (m.mat[0][0] < -m.mat[1][1]) {
+				t = 1 - m.mat[0][0] - m.mat[1][1] + m.mat[2][2];
+				q = new Quaternion(m.mat[2][0] + m.mat[0][2], m.mat[1][2] + m.mat[2][1], t, m.mat[0][1] - m.mat[1][0]);
+			}
+			else {
+				t = 1 + m.mat[0][0] + m.mat[1][1] + m.mat[2][2];
+				q = new Quaternion(m.mat[1][2] - m.mat[2][1], m.mat[2][0] - m.mat[0][2], m.mat[0][1] - m.mat[1][0], t);
+			}
+		}
+		q.muli(0.5f / (float) Math.sqrt(t));
+		return q;
+	}
+
+	/**
+	 * Returns the rotation matrix described by the quaternion. The quaternion must be a unit quaternion, so it is normalized first. 
+	 * 
+	 * The matrix describes the transformation qpq*, so the rotation stored in the quaternion must have theta / 2. 
+	 * @param a
+	 * @return
+	 */
+	public static Mat4 quaternionToRotationMat4(Quaternion a) {
+		float[][] mat = new float[4][4];
+
+		a.normalize();
+
+		mat[0][0] = 1 - 2 * a.j * a.j - 2 * a.k * a.k;
+		mat[0][1] = 2 * a.i * a.j - 2 * a.s * a.k;
+		mat[0][2] = 2 * a.i * a.k + 2 * a.s * a.j;
+		mat[0][3] = 0;
+
+		mat[1][0] = 2 * a.i * a.j + 2 * a.s * a.k;
+		mat[1][1] = 1 - 2 * a.i * a.i - 2 * a.k * a.k;
+		mat[1][2] = 2 * a.j * a.k - 2 * a.s * a.i;
+		mat[1][3] = 0;
+
+		mat[2][0] = 2 * a.i * a.k - 2 * a.s * a.j;
+		mat[2][1] = 2 * a.j * a.k + 2 * a.s * a.i;
+		mat[2][2] = 1 - 2 * a.i * a.i - 2 * a.j * a.j;
+		mat[2][3] = 0;
+
+		mat[3][0] = 0;
+		mat[3][1] = 0;
+		mat[3][2] = 0;
+		mat[3][3] = 1;
+
+		return new Mat4(mat);
+	}
+
+	/**
+	 * Gives the angle between two unit quaternions. 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static float quaternionAngleBetween(Quaternion a, Quaternion b) {
+		Quaternion c = a.mul(b.inv());
+		return c.s;
+	}
+
+	// -- GEOMETRY --
 
 	/**
 	 * Calculates the normal of a triangle given the three points.

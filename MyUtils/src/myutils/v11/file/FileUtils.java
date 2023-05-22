@@ -79,6 +79,10 @@ public class FileUtils {
 		return path.substring(lastPeriod + 1);
 	}
 
+	public static String getFileExtension(File f) {
+		return getFileExtension(f.getPath());
+	}
+
 	public static String removeFileExtension(String path) {
 		int lastPeriod = path.lastIndexOf('.');
 		return path.substring(0, lastPeriod);

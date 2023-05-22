@@ -71,6 +71,10 @@ public class Vec3 {
 		return result;
 	}
 
+	public float lengthSq() {
+		return this.x * this.x + this.y * this.y + this.z * this.z;
+	}
+
 	public float length() {
 		return (float) Math.sqrt(x * x + y * y + z * z);
 	}
