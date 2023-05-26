@@ -1,5 +1,7 @@
 package myutils.v10.math;
 
+import java.util.StringTokenizer;
+
 public class Vec3 {
 	public float x, y, z;
 
@@ -180,6 +182,14 @@ public class Vec3 {
 
 	@Override
 	public String toString() {
-		return this.x + ", " + this.y + ", " + this.z;
+		return this.x + " " + this.y + " " + this.z;
+	}
+
+	public static Vec3 parseVec3(String s) {
+		StringTokenizer st = new StringTokenizer(s);
+		float x = Float.parseFloat(st.nextToken());
+		float y = Float.parseFloat(st.nextToken());
+		float z = Float.parseFloat(st.nextToken());
+		return new Vec3(x, y, z);
 	}
 }

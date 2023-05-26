@@ -29,7 +29,7 @@ public class FileUtils {
 	}
 
 	public static File loadFileRelative(String filepath) {
-		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res\\";
+		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res";
 		return loadFile(resDirectory + filepath);
 	}
 
@@ -70,7 +70,7 @@ public class FileUtils {
 	}
 
 	public static BufferedImage loadImageRelative(String filepath) {
-		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res\\";
+		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res";
 		return loadImage(resDirectory + filepath);
 	}
 
@@ -104,11 +104,11 @@ public class FileUtils {
 	}
 
 	public static File[] getAllFilesFromDirectoryRelative(String path) {
-		return getAllFilesFromDirectory(SystemUtils.getWorkingDirectory() + "\\res\\" + path);
+		return getAllFilesFromDirectory(SystemUtils.getWorkingDirectory() + "\\res" + path);
 	}
 
 	public static String[] getAllFilenamesFromDirectoryRelative(String path) {
-		return getAllFilenamesFromDirectory(SystemUtils.getWorkingDirectory() + "\\res\\" + path);
+		return getAllFilenamesFromDirectory(SystemUtils.getWorkingDirectory() + "\\res" + path);
 	}
 
 	public static File[] openFileExplorer() {

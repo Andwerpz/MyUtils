@@ -1,5 +1,7 @@
 package myutils.v10.math;
 
+import java.util.StringTokenizer;
+
 public class Quaternion {
 
 	//in order to utilize this to represent 3D rotations, s is theta, and i, j, k, is the unit vector
@@ -121,6 +123,25 @@ public class Quaternion {
 
 	public void normalize() {
 		this.divi(this.length());
+	}
+
+	@Override
+	public String toString() {
+		String ret = "";
+		ret += this.s + " ";
+		ret += this.i + " ";
+		ret += this.j + " ";
+		ret += this.k;
+		return ret;
+	}
+
+	public static Quaternion parseQuaternion(String string) {
+		StringTokenizer st = new StringTokenizer(string);
+		float s = Float.parseFloat(st.nextToken());
+		float i = Float.parseFloat(st.nextToken());
+		float j = Float.parseFloat(st.nextToken());
+		float k = Float.parseFloat(st.nextToken());
+		return new Quaternion(s, i, j, k);
 	}
 
 }
