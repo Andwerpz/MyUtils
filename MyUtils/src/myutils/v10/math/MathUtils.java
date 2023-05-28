@@ -109,31 +109,33 @@ public class MathUtils {
 	 * Returns the quaternion described by the rotation matrix
 	 * 
 	 * Source : https://d3cw3dd2w32x2b.cloudfront.net/wp-content/uploads/2015/01/matrix-to-quat.pdf
+	 * 
+	 * Note that the article uses quaternions in the form (i, j, k, s), but I have it implemented like (s, i, j, k). 
 	 * @param m
 	 * @return
 	 */
 	public static Quaternion quaternionFromRotationMat4(Mat4 a) {
-		Mat4 m = a.transpose(); //the article uses the matrix in column major
+		Mat4 m = new Mat4(a);
 		Quaternion q = null;
 		float t = 0;
 		if (m.mat[2][2] < 0) {
 			if (m.mat[0][0] > m.mat[1][1]) {
 				t = 1 + m.mat[0][0] - m.mat[1][1] - m.mat[2][2];
-				q = new Quaternion(t, m.mat[0][1] + m.mat[1][0], m.mat[2][0] + m.mat[0][2], m.mat[1][2] - m.mat[2][1]);
+				q = new Quaternion(m.mat[1][2] - m.mat[2][1], t, m.mat[0][1] + m.mat[1][0], m.mat[2][0] + m.mat[0][2]);
 			}
 			else {
 				t = 1 - m.mat[0][0] + m.mat[1][1] - m.mat[2][2];
-				q = new Quaternion(m.mat[0][1] + m.mat[1][0], t, m.mat[1][2] + m.mat[2][1], m.mat[2][0] - m.mat[0][2]);
+				q = new Quaternion(m.mat[2][0] - m.mat[0][2], m.mat[0][1] + m.mat[1][0], t, m.mat[1][2] + m.mat[2][1]);
 			}
 		}
 		else {
 			if (m.mat[0][0] < -m.mat[1][1]) {
 				t = 1 - m.mat[0][0] - m.mat[1][1] + m.mat[2][2];
-				q = new Quaternion(m.mat[2][0] + m.mat[0][2], m.mat[1][2] + m.mat[2][1], t, m.mat[0][1] - m.mat[1][0]);
+				q = new Quaternion(m.mat[0][1] - m.mat[1][0], m.mat[2][0] + m.mat[0][2], m.mat[1][2] + m.mat[2][1], t);
 			}
 			else {
 				t = 1 + m.mat[0][0] + m.mat[1][1] + m.mat[2][2];
-				q = new Quaternion(m.mat[1][2] - m.mat[2][1], m.mat[2][0] - m.mat[0][2], m.mat[0][1] - m.mat[1][0], t);
+				q = new Quaternion(t, m.mat[1][2] - m.mat[2][1], m.mat[2][0] - m.mat[0][2], m.mat[0][1] - m.mat[1][0]);
 			}
 		}
 		q.muli(0.5f / (float) Math.sqrt(t));
