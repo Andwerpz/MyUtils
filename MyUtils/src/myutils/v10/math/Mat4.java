@@ -42,6 +42,14 @@ public class Mat4 {
 		mat[2][2] = row3.z;
 	}
 
+	public void set(Mat4 m) {
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				this.mat[i][j] = m.mat[i][j];
+			}
+		}
+	}
+
 	public Mat4 transpose() {
 		float[][] nextMat = new float[4][4];
 		for (int i = 0; i < 4; i++) {
