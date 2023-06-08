@@ -1,15 +1,38 @@
 package myutils.v10.algorithm;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.PriorityQueue;
 import java.util.Stack;
 
-public class GraphUtils {
+import myutils.v10.misc.Pair;
 
+public class GraphUtils {
+	
+	//TODO move this into a graph objects
+	
+	private static <T> void buildGraph(ArrayList<GraphNode<T>> a) {
+		HashMap<T, GraphNode<T>> objToNode = new HashMap<>();
+		for(GraphNode<T> n : a) {
+			objToNode.put(n.obj, n);
+			n.nodeEdges.clear();
+		}
+		
+		//build node edges
+		for(GraphNode<T> n : a) {
+			for(T o : n.edges) {
+				n.nodeEdges.add(objToNode.get(o));
+			}
+		}
+	}
+	
 	/**
 	 * Given an adjacency list c, returns the strongly connected components. 
 	 * 
 	 * Nodes in the adjacency list should be normalized, so that all nodes have an id between 0 to n - 1, where
 	 * n is the amount of nodes. 
+	 * 
+	 * TODO make this take graph nodes
 	 * @param c
 	 * @return
 	 */
@@ -67,6 +90,31 @@ public class GraphUtils {
 		for (int i = 0; i < rc.get(x).size(); i++) {
 			kosajaru2(rc.get(x).get(i), v, ans, rc);
 		}
+	}
+	
+	/**
+	 * Topologically sorts the given graph, and returns true.
+	 * 
+	 * A graph is considered topologically sorted if for every pair of indices i, j, where i < j, the node
+	 * at j is never an ancestor of the node at i. 
+	 * 
+	 * In the case that a topological sort is impossible, (in that case, the graph is not a DAG), it will return false. 
+	 * @param <T>
+	 * @param a
+	 */
+	public static <T> boolean topologicalSort(ArrayList<GraphNode<T>> a) {
+		GraphUtils.buildGraph(a);
+		
+		//reverse all edges
+		
+		
+		ArrayList<GraphNode<T>> sorted = new ArrayList<>();
+		PriorityQueue<Pair<Integer, GraphNode<T>>> q = new PriorityQueue<>();
+		while(q.size() != 0) {
+			
+		}
+		
+		return true;
 	}
 
 }
