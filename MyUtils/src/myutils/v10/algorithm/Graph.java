@@ -10,8 +10,8 @@ public class Graph<T> {
 	
 	private HashMap<T, GraphNode<T>> objToNode;
 	
-	private HashMap<GraphNode<T>, ArrayList<GraphNode<T>>> adjList;
-	private HashMap<GraphNode<T>, ArrayList<GraphNode<T>>> revAdjList;
+	private HashMap<GraphNode<T>, HashSet<GraphNode<T>>> adjList;
+	private HashMap<GraphNode<T>, HashSet<GraphNode<T>>> revAdjList;
 	
 	public Graph() {
 		this.nodes = new HashSet<>();
@@ -35,19 +35,34 @@ public class Graph<T> {
 		this.nodes.add(n);
 		this.objToNode.put(a, n);
 		
-		this.adjList.put(n, new ArrayList<>());
-		this.revAdjList.put(n, new ArrayList<>());
+		this.adjList.put(n, new HashSet<>());
+		this.revAdjList.put(n, new HashSet<>());
+	}
+	
+	private GraphNode<T> getNodeFromObj(T a) {
+		if(!this.doesNodeExist(a)) {
+			return null;
+		}
+		return this.objToNode.get(a);
+	}
+	
+	public boolean doesEdgeExist(T a, T b) {
+		if(!this.doesNodeExist(a) || !this.doesNodeExist(b)) {
+			return false;
+		}
+		return this.adjList.get(a).contains(b);
 	}
 	
 	public void addEdge(T a, T b) {
-		if(!this.doesNodeExist(a)) {
-			this.addNode(a);
-		}
-		if(!this.doesNodeExist(b)) {
-			this.addNode(b);
+		if(this.doesEdgeExist(a, b)) {
+			return;
 		}
 		
-		this.adjList.
+		GraphNode<T> u = this.getNodeFromObj(a);
+		GraphNode<T> v = this.getNodeFromObj(b);
+		
+		this.adjList.get(u).add(v);
+		this.revAdjList.get(v).add(u);
 	}
 	
 }
