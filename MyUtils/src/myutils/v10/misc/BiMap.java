@@ -69,4 +69,8 @@ public class BiMap<T1, T2> {
 		return this.valueMap.keySet();
 	}
 
+	public int size() {
+		return this.keyMap.size();
+	}
+
 }

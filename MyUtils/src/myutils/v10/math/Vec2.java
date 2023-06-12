@@ -48,6 +48,10 @@ public class Vec2 {
 		return this;
 	}
 
+	public Vec2 setLength(double len) {
+		return this.setLength((float) len);
+	}
+
 	/**
 	 * Negates this vector and returns this.
 	 */
@@ -92,6 +96,18 @@ public class Vec2 {
 	 */
 	public Vec2 mul(float s) {
 		return mul(s, new Vec2());
+	}
+
+	public Vec2 muli(double s) {
+		return this.muli((float) s);
+	}
+
+	public Vec2 mul(double s, Vec2 out) {
+		return this.mul((float) s, out);
+	}
+
+	public Vec2 mul(double s) {
+		return this.mul((float) s);
 	}
 
 	/**
@@ -284,6 +300,14 @@ public class Vec2 {
 		y = yp;
 
 		return this;
+	}
+
+	/**
+	 * Rotates this vector by the given radians.
+	 * @return 
+	 */
+	public Vec2 rotate(double radians) {
+		return this.rotate((float) radians);
 	}
 
 	/**
