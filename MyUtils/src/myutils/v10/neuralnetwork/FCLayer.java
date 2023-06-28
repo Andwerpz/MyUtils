@@ -2,7 +2,10 @@ package myutils.v10.neuralnetwork;
 
 import myutils.v10.math.MathUtils;
 
-public class FCLayer extends Layer{
+public class FCLayer extends NeuralNetworkLayer {
+	
+	//TODO
+	// - dropout
 	
 	public static final int ACTIVATION_TYPE_SIGMOID = 0;
 	public static final int ACTIVATION_TYPE_RELU = 1;
@@ -90,7 +93,7 @@ public class FCLayer extends Layer{
 	}
 
 	@Override
-	public void forwardPropogate(Layer l) {
+	public void forwardPropogate(NeuralNetworkLayer l) {
 		//clear activation
 		this.outputNodes = new float[outputNodeAmt];
 		this.inputNodes = new float[inputNodeAmt];
@@ -128,7 +131,9 @@ public class FCLayer extends Layer{
 	}
 	
 	//if this layer is the output layer
-	public void backPropogate(float[] ans) {
+	
+	//returns the cost of the neural network. 
+	public float backPropogate(float[] ans) {
 		
 		//clear derivatives
 		this.outputNodeDerivatives = new float[this.outputNodeAmt];
@@ -139,27 +144,19 @@ public class FCLayer extends Layer{
 		//sum((ans[i] - output[i])^2) for all i
 		//so the derivative of cost is -2 * (ans[i] - output[i])
 		
+		float cost = 0;
 		for(int node = 0; node < this.outputNodes.length; node++) {
+			cost += (float) Math.pow(ans[node] - this.outputNodes[node], 2);
 			this.outputNodeDerivatives[node] = -2 * (ans[node] - this.outputNodes[node]);
 		}
 		
-		//calc output node derivatives
-//		for(int node = 0; node < this.outputNodes.length; node++) {
-//			//calc cost function derivative
-//			if(this.outputNodeAmt == 1) {
-//				this.outputNodeDerivatives[node] = (this.outputNodes[node] - ans) * 2;
-//			}
-//			else {
-//				this.outputNodeDerivatives[node] = (float) ((this.outputNodes[node] - ((int) ans == node? 1d : 0d)) * 2);
-//			}
-//		}
-		
 		this.calculateDerivatives();
+		return cost;
 	}
 
 	//loads the derivative of the output of the output nodes to the cost
 	@Override
-	public void backPropogate(Layer l) {
+	public void backPropogate(NeuralNetworkLayer l) {
 		
 		//clear derivatives
 		this.outputNodeDerivatives = new float[this.outputNodeAmt];
