@@ -1397,8 +1397,8 @@ public class MathUtils {
 	 * @param x
 	 * @return
 	 */
-	public static double sigmoid(double x) {
-		return (1d / (1d + Math.pow(Math.E, (-1d * x))));
+	public static float sigmoid(double x) {
+		return (float) (1f / (1f + Math.pow(Math.E, (-1f * x))));
 	}
 
 	/**
@@ -1407,8 +1407,8 @@ public class MathUtils {
 	 * @param x
 	 * @return
 	 */
-	public static double sigmoidDerivative(double x) {
-		return sigmoid(x) * (1d - sigmoid(x));
+	public static float sigmoidDerivative(double x) {
+		return sigmoid(x) * (1f - sigmoid(x));
 	}
 
 	/**
@@ -1417,8 +1417,8 @@ public class MathUtils {
 	 * @param x
 	 * @return
 	 */
-	public static double relu(double x) {
-		return Math.max(0, x);
+	public static float relu(double x) {
+		return (float) Math.max(0, x);
 	}
 
 	/**
@@ -1427,8 +1427,8 @@ public class MathUtils {
 	 * @param x
 	 * @return
 	 */
-	public static double logit(double x) {
-		return Math.log(x / (1d - x));
+	public static float logit(double x) {
+		return (float) Math.log(x / (1d - x));
 	}
 
 	/**
@@ -1437,7 +1437,7 @@ public class MathUtils {
 	 * @param x
 	 * @return
 	 */
-	public static double reluDerivative(double x) {
+	public static float reluDerivative(double x) {
 		return x <= 0 ? 0 : 1;
 	}
 
@@ -1449,15 +1449,15 @@ public class MathUtils {
 	 * @param x
 	 * @return
 	 */
-	public static double irwinHallDistribution(double x) {
+	public static float irwinHallDistribution(double x) {
 		if (-2 < x && x < -1) {
-			return 0.25 * Math.pow(x + 2, 3);
+			return (float) (0.25f * Math.pow(x + 2, 3));
 		}
 		if (-1 < x && x < 1) {
-			return 0.25 * (Math.pow(Math.abs(x), 3) * 3 - Math.pow(x, 2) * 6 + 4);
+			return (float) (0.25f * (Math.pow(Math.abs(x), 3) * 3 - Math.pow(x, 2) * 6 + 4));
 		}
 		if (1 < x && x < 2) {
-			return 0.25 * Math.pow(2 - x, 3);
+			return (float) (0.25f * Math.pow(2 - x, 3));
 		}
 		return 0;
 	}

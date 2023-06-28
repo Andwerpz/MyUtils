@@ -1,5 +1,7 @@
 package myutils.v10.misc;
 
+import java.util.Objects;
+
 public class Pair<T1, T2> implements Comparable<Pair<T1, T2>> {
 
 	public T1 first;
@@ -20,6 +22,11 @@ public class Pair<T1, T2> implements Comparable<Pair<T1, T2>> {
 			ret = ((Comparable<T2>) this.second).compareTo(o.second);
 		}
 		return ret;
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.first, this.second);
 	}
 
 }
