@@ -61,6 +61,10 @@ public class FCLayer extends HiddenLayer {
 				else if (this.activationType == NeuralNetwork.ACTIVATION_TYPE_LINEAR) {
 					nextWeight = (float) (Math.random() * (Math.sqrt(2) / this.inputNodeAmt));
 				}
+				else if (this.activationType == NeuralNetwork.ACTIVATION_TYPE_TANH) {
+					float range = (float) (1f / Math.sqrt(inputNodeAmt));
+					nextWeight = (float) (Math.random() * range * 2) - range;
+				}
 				this.weights[node][weight] = nextWeight;
 			}
 		}
@@ -109,10 +113,9 @@ public class FCLayer extends HiddenLayer {
 				this.outputNodes[weight] += val * curWeights[weight];
 			}
 		}
-
+		
+		//apply activation function to output nodes
 		for (int node = 0; node < this.outputNodes.length; node++) {
-			//activation function
-
 			if (this.activationType == NeuralNetwork.ACTIVATION_TYPE_SIGMOID) {
 				this.outputNodes[node] = MathUtils.sigmoid(this.outputNodes[node]);
 			}
@@ -122,7 +125,9 @@ public class FCLayer extends HiddenLayer {
 			else if (this.activationType == NeuralNetwork.ACTIVATION_TYPE_LINEAR) {
 				this.outputNodes[node] = this.outputNodes[node];
 			}
-			//System.out.print(this.outputNodes[node] + " ");
+			else if (this.activationType == NeuralNetwork.ACTIVATION_TYPE_TANH) {
+				this.outputNodes[node] = MathUtils.tanh(this.outputNodes[node]);
+			}
 		}
 	}
 
@@ -158,6 +163,11 @@ public class FCLayer extends HiddenLayer {
 			}
 			else if (this.activationType == NeuralNetwork.ACTIVATION_TYPE_LINEAR) {
 				this.outputNodeDerivatives[node] *= 1;
+			}
+			else if (this.activationType == NeuralNetwork.ACTIVATION_TYPE_TANH) {
+				//outputNodeDerivatives store the value after applying the sigmoid function
+				//since we need the input to calc the derivative, use invtanh function to get the input
+				this.outputNodeDerivatives[node] *= MathUtils.tanhDerivative(MathUtils.invtanh(this.outputNodes[node]));
 			}
 		}
 

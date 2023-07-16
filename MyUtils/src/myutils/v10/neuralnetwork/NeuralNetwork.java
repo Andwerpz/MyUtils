@@ -12,6 +12,9 @@ public class NeuralNetwork {
 
 	//typically used in the output layer of regression neural networks. 
 	public static final int ACTIVATION_TYPE_LINEAR = 2;
+	
+	//used in hidden layers
+	public static final int ACTIVATION_TYPE_TANH = 3;
 
 	public float learningRate = 0.01f;
 
@@ -64,9 +67,9 @@ public class NeuralNetwork {
 
 	//does backprop and nudges the weights
 	//returns the cost of the neural network on the given input
-	public void backPropogate(float[] input, float[] key) {
+	public float backPropogate(float[] input, float[] key) {
 		if (!this.isNetworkValid()) {
-			return;
+			return 0;
 		}
 
 		//run forward prop
@@ -79,7 +82,7 @@ public class NeuralNetwork {
 		for (int i = this.layers.size() - 2; i >= 1; i--) {
 			((HiddenLayer) this.layers.get(i)).backPropogate(this.layers.get(i + 1));
 		}
-		return;
+		return cost;
 	}
 
 }
