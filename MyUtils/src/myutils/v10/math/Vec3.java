@@ -94,6 +94,19 @@ public class Vec3 {
 		return result;
 	}
 
+	public Vec3 muli(float x, float y, float z) {
+		this.x *= x;
+		this.y *= y;
+		this.z *= z;
+		return this;
+	}
+
+	public Vec3 mul(float x, float y, float z) {
+		Vec3 result = new Vec3(this);
+		result.muli(x, y, z);
+		return result;
+	}
+
 	public Vec3 divi(float val) {
 		this.x /= val;
 		this.y /= val;
@@ -123,7 +136,7 @@ public class Vec3 {
 	}
 
 	/**
-	 * this x a
+	 * returns cross(this, a)
 	 * @param a
 	 * @return
 	 */

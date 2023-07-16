@@ -1,6 +1,5 @@
 package myutils.v11.file;
 
-import java.awt.Desktop;
 import java.awt.FileDialog;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -8,6 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -15,9 +18,29 @@ import javax.swing.JFrame;
 import myutils.v10.file.SystemUtils;
 
 public class FileUtils {
-
 	// NOTE: all filepaths unless specified to be relative to the current working directory, should be from the root directory. 
-	// if it is relative, it's relative to the \res folder
+	// if it is relative, it's relative to the current working directory, not the '\res' folder as it used to be. 
+
+	public static byte[] convertInputStreamToByteArray(InputStream input) {
+		try {
+			return input.readAllBytes();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Takes in a filepath relative to the current working directory, and returns the absolute filepath. 
+	 * @param relativeFilepath
+	 * @return
+	 */
+	public static String generateAbsoluteFilepath(String relativeFilepath) {
+		String resDirectory = SystemUtils.getWorkingDirectory();
+		return resDirectory + relativeFilepath;
+	}
 
 	public static File loadFile(String filepath) {
 		System.out.print("LOADING FILE: " + filepath);
@@ -29,8 +52,8 @@ public class FileUtils {
 	}
 
 	public static File loadFileRelative(String filepath) {
-		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res";
-		return loadFile(resDirectory + filepath);
+		File file = loadFile(FileUtils.generateAbsoluteFilepath(filepath));
+		return file;
 	}
 
 	public static String loadAsStringRelative(String file) {
@@ -53,13 +76,12 @@ public class FileUtils {
 		return result.toString();
 	}
 
-	public static BufferedImage loadImage(String filepath) {
+	public static BufferedImage loadImage(File file) {
 		BufferedImage img = null;
-
-		System.out.print("LOADING IMAGE: " + filepath);
+		System.out.print("LOADING IMAGE: " + file.getPath());
 
 		try {
-			img = ImageIO.read(new File(filepath));
+			img = ImageIO.read(file);
 			System.out.println(" SUCCESS");
 		}
 		catch (IOException e) {
@@ -69,9 +91,13 @@ public class FileUtils {
 		return img;
 	}
 
+	public static BufferedImage loadImage(String filepath) {
+		return loadImage(FileUtils.loadFile(filepath));
+	}
+
 	public static BufferedImage loadImageRelative(String filepath) {
-		String resDirectory = SystemUtils.getWorkingDirectory() + "\\res";
-		return loadImage(resDirectory + filepath);
+		BufferedImage image = loadImage(FileUtils.loadFileRelative(filepath));
+		return image;
 	}
 
 	public static String getFileExtension(String path) {
@@ -104,11 +130,11 @@ public class FileUtils {
 	}
 
 	public static File[] getAllFilesFromDirectoryRelative(String path) {
-		return getAllFilesFromDirectory(SystemUtils.getWorkingDirectory() + "\\res" + path);
+		return getAllFilesFromDirectory(FileUtils.generateAbsoluteFilepath(path));
 	}
 
 	public static String[] getAllFilenamesFromDirectoryRelative(String path) {
-		return getAllFilenamesFromDirectory(SystemUtils.getWorkingDirectory() + "\\res" + path);
+		return getAllFilenamesFromDirectory(FileUtils.generateAbsoluteFilepath(path));
 	}
 
 	public static File[] openFileExplorer() {
