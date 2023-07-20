@@ -3,7 +3,7 @@ package myutils.v10.math;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class NoiseGenerator {
+public class PerlinNoiseGenerator {
 
 	//frequency : positive value controlling how fine the noise is. Higher values are more fine
 	//amplitude : real value multiplied with the result of the noise. Range of noise is from -amplitude to amplitude
