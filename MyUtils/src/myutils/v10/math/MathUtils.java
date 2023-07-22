@@ -24,6 +24,18 @@ public class MathUtils {
 	}
 
 	/**
+	 * Takes in a value, and returns it clamped to two other inputs
+	 * 
+	 * @param low
+	 * @param high
+	 * @param val
+	 * @return
+	 */
+	public static double clamp(double low, double high, double val) {
+		return val < low ? low : (val > high ? high : val);
+	}
+
+	/**
 	 * Linearly interpolates between two points
 	 * 
 	 * @param x1
@@ -1440,7 +1452,7 @@ public class MathUtils {
 	public static float reluDerivative(double x) {
 		return x <= 0 ? 0 : 1;
 	}
-	
+
 	/**
 	 * Hyperbolic tangent function
 	 * 
@@ -1450,7 +1462,7 @@ public class MathUtils {
 	public static float tanh(double x) {
 		return (float) ((Math.exp(x) - Math.exp(-x)) / (Math.exp(x) + Math.exp(-x)));
 	}
-	
+
 	/**
 	 * Derivative of hyperbolic tangent function
 	 * 
@@ -1460,7 +1472,7 @@ public class MathUtils {
 	public static float tanhDerivative(double x) {
 		return (float) (1.0 - Math.pow(MathUtils.tanh(x), 2));
 	}
-	
+
 	/**
 	 * Inverse of hyperbolic tangent
 	 * Defined on the range (-1, 1)
@@ -1469,10 +1481,10 @@ public class MathUtils {
 	 */
 	public static float invtanh(double x) {
 		System.out.println(x);
-		if(x <= -1) {
+		if (x <= -1) {
 			return (float) -1e9;
 		}
-		else if(x >= 1) {
+		else if (x >= 1) {
 			return (float) 1e9;
 		}
 		return (float) ((Math.log((1.0 + x) / (1.0 - x))) / 2.0f);
