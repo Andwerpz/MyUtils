@@ -36,6 +36,18 @@ public class MathUtils {
 	}
 
 	/**
+	 * Takes in a value, and returns it clamped to two other inputs
+	 * 
+	 * @param low
+	 * @param high
+	 * @param val
+	 * @return
+	 */
+	public static int clamp(int low, int high, int val) {
+		return val < low ? low : (val > high ? high : val);
+	}
+
+	/**
 	 * Linearly interpolates between two points
 	 * 
 	 * @param x1
