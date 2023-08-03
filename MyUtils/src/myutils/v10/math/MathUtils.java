@@ -215,6 +215,32 @@ public class MathUtils {
 	// -- GEOMETRY --
 
 	/**
+	 * Generates a random unit vector that is perpendicular to the given vector. 
+	 * @param dir
+	 * @return
+	 */
+	public static Vec3 generateRandomPerpendicularVec3(Vec3 dir) {
+		//select vector that is not parallel with dir. 
+		Vec3 u = new Vec3(dir.y, -dir.x, 0);
+		if (Math.abs(1.0f - u.dot(dir)) < EPSILON) {
+			u = new Vec3(dir.z, 0, -dir.x);
+			if (Math.abs(1.0f - u.dot(dir)) < EPSILON) {
+				u = new Vec3(0, dir.z, -dir.y);
+			}
+		}
+
+		//generate vector that is perpendicular to dir
+		Vec3 v = dir.cross(u);
+		v.normalize();
+		u.normalize();
+
+		float theta = (float) (Math.random() * Math.PI * 2);
+		Vec3 res = u.mul((float) Math.cos(theta)).add(v.mul((float) Math.sin(theta)));
+
+		return res;
+	}
+
+	/**
 	 * Calculates the normal of a triangle given the three points.
 	 * 
 	 * @param t0

@@ -180,11 +180,9 @@ public class Mat4 {
 
 	/**
 	 * Returns a matrix that will rotate around the z axis
-	 * 
 	 * @param rad
 	 * @return
 	 */
-
 	public static Mat4 rotateZ(float rad) {
 		Mat4 result = identity();
 		float cos = (float) Math.cos(rad);
@@ -200,11 +198,9 @@ public class Mat4 {
 
 	/**
 	 * Returns a matrix that will rotate around the x axis
-	 * 
 	 * @param rad
 	 * @return
 	 */
-
 	public static Mat4 rotateX(float rad) {
 		Mat4 result = identity();
 		float cos = (float) Math.cos(rad);
@@ -220,11 +216,9 @@ public class Mat4 {
 
 	/**
 	 * Returns a matrix that will rotate around the y axis
-	 * 
 	 * @param rad
 	 * @return
 	 */
-
 	public static Mat4 rotateY(float rad) {
 		Mat4 result = identity();
 		float cos = (float) Math.cos(rad);
@@ -236,6 +230,73 @@ public class Mat4 {
 		result.mat[2][2] = cos;
 
 		return result;
+	}
+
+	/**
+	 * Returns a matrix that will rotate around the given axis, by the given angle
+	 * 
+	 * https://stackoverflow.com/questions/6721544/circular-rotation-around-an-arbitrary-axis
+	 * @param axis
+	 * @param rad
+	 * @return
+	 */
+	public static Mat4 rotate(Vec3 axis, float rad) {
+		axis.normalize();
+
+		float cos = (float) Math.cos(rad);
+		float sin = (float) Math.sin(rad);
+
+		Mat4 result = identity();
+		result.mat[0][0] = cos + axis.x * axis.x * (1.0f - cos);
+		result.mat[0][1] = axis.x * axis.y * (1.0f - cos) - axis.z * sin;
+		result.mat[0][2] = axis.x * axis.z * (1.0f - cos) + axis.y * sin;
+
+		result.mat[1][0] = axis.x * axis.y * (1.0f - cos) + axis.z * sin;
+		result.mat[1][1] = cos + axis.y * axis.y * (1.0f - cos);
+		result.mat[1][2] = axis.y * axis.z * (1.0f - cos) - axis.x * sin;
+
+		result.mat[2][0] = axis.x * axis.z * (1.0f - cos) - axis.y * sin;
+		result.mat[2][1] = axis.y * axis.z * (1.0f - cos) + axis.x * sin;
+		result.mat[2][2] = cos + axis.z * axis.z * (1.0f - cos);
+
+		return result;
+	}
+
+	/**
+	 * Returns a matrix that when applied to the input vector 'a', will rotate it so that it is parallel to 'b'. 
+	 * 
+	 * Does not work in the case where a.dot(b) == -1. 
+	 * 
+	 * https://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d
+	 * @param basis
+	 * @param dir
+	 * @return
+	 */
+	public static Mat4 rotateAToB(Vec3 a, Vec3 b) {
+		a.normalize();
+		b.normalize();
+
+		Vec3 v = a.cross(b);
+		float sin = v.length();
+		float cos = a.dot(b);
+
+		Mat4 vx = Mat4.identity();
+		vx.mat[0][0] = 0;
+		vx.mat[0][1] = -v.z;
+		vx.mat[0][2] = v.y;
+
+		vx.mat[1][0] = v.z;
+		vx.mat[1][1] = 0;
+		vx.mat[1][2] = -v.x;
+
+		vx.mat[2][0] = -v.y;
+		vx.mat[2][1] = v.x;
+		vx.mat[2][2] = 0;
+
+		vx.mat[3][3] = 0;
+
+		Mat4 ret = Mat4.identity().add(vx).add(vx.mul(vx).mul(1.0f / (1.0f + cos)));
+		return ret;
 	}
 
 	public static Mat4 scale(float amt) {
@@ -290,6 +351,23 @@ public class Mat4 {
 		return this;
 	}
 
+	public Mat4 mul(float f) {
+		Mat4 result = new Mat4();
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				result.mat[i][j] = this.mat[i][j] * f;
+			}
+		}
+
+		return result;
+	}
+
+	public Mat4 muli(float f) {
+		this.mat = this.mul(f).mat;
+		return this;
+	}
+
 	public Vec3 mul(Vec3 vec, float w) {
 		//		return new Vec3(
 		//			vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0] + w * mat[3][0],
@@ -298,6 +376,23 @@ public class Mat4 {
 		//		);
 
 		return new Vec3(vec.x * mat[0][0] + vec.y * mat[0][1] + vec.z * mat[0][2] + w * mat[0][3], vec.x * mat[1][0] + vec.y * mat[1][1] + vec.z * mat[1][2] + w * mat[1][3], vec.x * mat[2][0] + vec.y * mat[2][1] + vec.z * mat[2][2] + w * mat[2][3]);
+	}
+
+	public Mat4 add(Mat4 matrix) {
+		Mat4 result = new Mat4();
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				result.mat[i][j] = matrix.mat[i][j] + this.mat[i][j];
+			}
+		}
+
+		return result;
+	}
+
+	public Mat4 addi(Mat4 matrix) {
+		this.mat = this.add(matrix).mat;
+		return this;
 	}
 
 	@Override
