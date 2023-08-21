@@ -39,6 +39,20 @@ public class Vec4 {
 		this.w = v.w;
 	}
 
+	public Vec4 mul(float f) {
+		Vec4 ret = new Vec4(this);
+		ret.x *= f;
+		ret.y *= f;
+		ret.z *= f;
+		ret.w *= f;
+		return ret;
+	}
+
+	public Vec4 muli(float f) {
+		this.set(this.mul(f));
+		return this;
+	}
+
 	@Override
 	public String toString() {
 		return this.x + ", " + this.y + ", " + this.z + ", " + this.w;

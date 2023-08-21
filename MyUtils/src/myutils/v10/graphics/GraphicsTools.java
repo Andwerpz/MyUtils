@@ -65,6 +65,23 @@ public class GraphicsTools {
 	}
 
 	public static BufferedImage generateTextImage(String text, Font font, Color c, int widthCutoff) {
+		return GraphicsTools.generateTextImage(text, font, c, widthCutoff, null, true);
+	}
+
+	/**
+	 * Returns a buffered image with a left aligned string drawn on it.
+	 * Vertical alignment is dictated by the text ascent and descent values.
+	 * 
+	 * If backgroundColor is null, then the background of the image will be transparent. 
+	 * @param text
+	 * @param font
+	 * @param c
+	 * @param widthCutoff
+	 * @param backgroundColor
+	 * @param doAntialiasing
+	 * @return
+	 */
+	public static BufferedImage generateTextImage(String text, Font font, Color c, int widthCutoff, Color backgroundColor, boolean doAntialiasing) {
 		if (widthCutoff <= 0) {
 			System.err.println("Width cutoff has to be greater than 0");
 			return null;
@@ -81,7 +98,15 @@ public class GraphicsTools {
 
 		BufferedImage img = new BufferedImage(widthCutoff, textMaxDescent + textMaxAscent, BufferedImage.TYPE_INT_ARGB);
 		Graphics g = img.getGraphics();
-		enableAntialiasing(g);
+
+		if (backgroundColor != null) {
+			g.setColor(backgroundColor);
+			g.fillRect(0, 0, img.getWidth(), img.getHeight());
+		}
+		if (doAntialiasing) {
+			enableAntialiasing(g);
+		}
+
 		g.setFont(font);
 		g.setColor(c);
 		g.drawString(text, 0, textMaxAscent);

@@ -15,18 +15,33 @@ public class Pair<T1, T2> implements Comparable<Pair<T1, T2>> {
 	@Override
 	public int compareTo(Pair<T1, T2> o) {
 		int ret = 0;
-		if(this.first instanceof Comparable) {
+		if (this.first instanceof Comparable) {
 			ret = ((Comparable<T1>) this.first).compareTo(o.first);
 		}
-		if(this.second instanceof Comparable && ret != 0) {
+		if (this.second instanceof Comparable && ret != 0) {
 			ret = ((Comparable<T2>) this.second).compareTo(o.second);
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.first, this.second);
+	}
+
+	@Override
+	public boolean equals(Object arg) {
+		if (arg == null) {
+			return false;
+		}
+		if (!(arg instanceof Pair<?, ?>)) {
+			return false;
+		}
+		if (arg == this) {
+			return true;
+		}
+		Pair<?, ?> p = (Pair<?, ?>) arg;
+		return this.first.equals(p.first) && this.second.equals(p.second);
 	}
 
 }
