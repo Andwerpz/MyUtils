@@ -6,7 +6,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import myutils.v10.graphics.GraphicsTools;
+
 public class TargaReader {
+
+	//TODO for some reason, decode() always initially spits out a vertically flipped image, 
+	//figure out why it's doing that. 
+
 	public static BufferedImage getImage(String fileName) {
 		System.out.println("LOADING IMAGE: " + fileName);
 		BufferedImage ans = null;
@@ -17,7 +23,8 @@ public class TargaReader {
 			bis.read(buf);
 			bis.close();
 			ans = decode(buf);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return ans;
@@ -55,7 +62,7 @@ public class TargaReader {
 		int[] pixels = new int[n];
 		int idx = 0;
 
-		if(buf[2] == 0x02 && buf[16] == 0x20) { // uncompressed BGRA
+		if (buf[2] == 0x02 && buf[16] == 0x20) { // uncompressed BGRA
 			while (n > 0) {
 				int b = read(buf);
 				int g = read(buf);
@@ -66,7 +73,7 @@ public class TargaReader {
 				n -= 1;
 			}
 		}
-		else if(buf[2] == 0x02 && buf[16] == 0x18) { // uncompressed BGR
+		else if (buf[2] == 0x02 && buf[16] == 0x18) { // uncompressed BGR
 			while (n > 0) {
 				int b = read(buf);
 				int g = read(buf);
@@ -81,7 +88,7 @@ public class TargaReader {
 			// RLE compressed
 			while (n > 0) {
 				int nb = read(buf); // num of pixels
-				if((nb & 0x80) == 0) { // 0x80=dec 128, bits 10000000
+				if ((nb & 0x80) == 0) { // 0x80=dec 128, bits 10000000
 					for (int i = 0; i <= nb; i++) {
 						int b = read(buf);
 						int g = read(buf);
@@ -104,6 +111,7 @@ public class TargaReader {
 
 		BufferedImage bimg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		bimg.setRGB(0, 0, width, height, pixels, 0, width);
+		bimg = GraphicsTools.verticalFlip(bimg);
 		return bimg;
 	}
 }
