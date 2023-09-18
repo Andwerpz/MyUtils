@@ -21,15 +21,13 @@ public class FileUtils {
 	// NOTE: all filepaths unless specified to be relative to the current working directory, should be from the root directory. 
 	// if it is relative, it's relative to the current working directory, not the '\res' folder as it used to be. 
 
-	public static byte[] convertInputStreamToByteArray(InputStream input) {
-		try {
-			return input.readAllBytes();
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	public static byte[] convertInputStreamToByteArray(InputStream input) throws IOException {
+		return input.readAllBytes();
+	}
+
+	public static byte[] convertFileToByteArray(File f) throws IOException {
+		byte[] arr = Files.readAllBytes(f.toPath());
+		return arr;
 	}
 
 	/**
