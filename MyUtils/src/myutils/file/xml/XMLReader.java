@@ -7,7 +7,7 @@ public class XMLReader {
 	private static XMLNode parseElementHeader(String s) {
 		//[\s=]+(?=([^"]*"[^"]*")*[^"]*$)
 		//the regex above will find any whitespace or equals sign that is not contained within quotes. 
-		//i don't support single quotes for now. 
+		//i don't support mixing single and double quotes for now.
 
 		//this is really jank. 
 		String regex = "[\\s=]+(?=([^\']*\'[^\']*\')*[^\']*$)";

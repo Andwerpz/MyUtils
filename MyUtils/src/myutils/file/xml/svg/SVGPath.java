@@ -13,6 +13,9 @@ public class SVGPath extends SVGElement {
 	//upper case means absolute coordinates
 	//lower case means relative coordinates to the previous cursor position. 
 
+	//my implementation converts all commands that refer to previous commands; all lowercase commands + T and S, into commands
+	//that don't refer to other ones. 
+
 	//TODO support elliptical arc curves
 
 	//command length in number of arguments
@@ -47,6 +50,9 @@ public class SVGPath extends SVGElement {
 	protected SVGPath(String content) {
 		super(SVGElement.TYPE_PATH);
 
+		//add some padding. 
+		content += " ";
+
 		//parse the content
 		//convert all relative commands to absolute ones. 
 		this.pathElements = new ArrayList<>();
@@ -74,28 +80,53 @@ public class SVGPath extends SVGElement {
 
 				char parse_cmd = content.charAt(ptr);
 
-				//look for next command character
-				int r = ptr + 1;
-				while (r != content.length() && !cmdLength.containsKey(content.charAt(r))) {
-					r++;
-				}
+				//move pointer past command character
+				ptr++;
 
 				//parse all coordinates belonging to current command
-				String[] tokens = content.substring(ptr + 1, r).split(" ");
-				int token_ptr = 0;
-				while (token_ptr != tokens.length) {
+				while (ptr != content.length() && !cmdLength.containsKey(content.charAt(ptr))) {
 					char cmd = parse_cmd;
 					List<Float> coords = new ArrayList<>();
 					for (int i = 0; i < cmdLength.get(cmd); i++) {
-						try {
-							Float val = Float.parseFloat(tokens[token_ptr + i]);
-							coords.add(val);
+						//traverse to next non-whitespace
+						while (ptr != content.length() && Character.isWhitespace(content.charAt(ptr))) {
+							ptr++;
 						}
-						catch (NumberFormatException e) {
-							//something went wrong with parsing the int. 
+
+						//parse the next float value
+						int lptr = ptr;
+						//negative has to be the first element
+						if (content.charAt(ptr) == '-') {
+							ptr++;
 						}
+						boolean seen_period = false;
+						while (ptr != content.length()) {
+							char next = content.charAt(ptr);
+							if (cmdLength.containsKey(next)) {
+								break;
+							}
+							else if (next == '.') {
+								if (!seen_period) {
+									seen_period = true;
+								}
+								else {
+									break;
+								}
+							}
+							else if (next == '-') {
+								break;
+							}
+							else if (Character.isWhitespace(next)) {
+								break;
+							}
+							ptr++;
+						}
+						coords.add(Float.parseFloat(content.substring(lptr, ptr)));
 					}
-					token_ptr += cmdLength.get(cmd);
+					//traverse to next non-whitespace
+					while (ptr != content.length() && Character.isWhitespace(content.charAt(ptr))) {
+						ptr++;
+					}
 
 					//if the current command is lowercase, convert it to an uppercase one
 					switch (cmd) {
@@ -284,7 +315,6 @@ public class SVGPath extends SVGElement {
 						break;
 					}
 				}
-				ptr = r;
 			}
 		}
 
