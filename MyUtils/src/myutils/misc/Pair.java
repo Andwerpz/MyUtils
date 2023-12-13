@@ -44,4 +44,9 @@ public class Pair<T1, T2> implements Comparable<Pair<T1, T2>> {
 		return this.first.equals(p.first) && this.second.equals(p.second);
 	}
 
+	@Override
+	public String toString() {
+		return "(" + this.first.toString() + ", " + this.second.toString() + ")";
+	}
+
 }

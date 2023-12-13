@@ -25,4 +25,11 @@ public class SystemUtils {
 		return System.getProperty("user.dir");
 	}
 
+	public static void printStackTrace() {
+		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+		for (int i = 0; i < stack.length; i++) {
+			System.err.println(stack[i]);
+		}
+	}
+
 }

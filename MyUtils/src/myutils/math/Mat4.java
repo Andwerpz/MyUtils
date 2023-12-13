@@ -178,6 +178,14 @@ public class Mat4 {
 		return Mat4.translate(new Vec3(x, y, z));
 	}
 
+	public static Mat4 translate(Vec2 vec2) {
+		return Mat4.translate(vec2.x, vec2.y, 0);
+	}
+
+	public static Mat4 translate(float x, float y) {
+		return Mat4.translate(x, y, 0);
+	}
+
 	/**
 	 * Returns a matrix that will rotate around the z axis
 	 * @param rad

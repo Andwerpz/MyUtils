@@ -5,6 +5,7 @@ public class Vec2 {
 	public float x, y;
 
 	public Vec2() {
+		set(0, 0);
 	}
 
 	public Vec2(Vec2 a, Vec2 b) {

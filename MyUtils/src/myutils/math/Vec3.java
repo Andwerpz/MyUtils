@@ -53,6 +53,12 @@ public class Vec3 {
 		this.z = v.z;
 	}
 
+	public void set(float x, float y, float z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
 	public Vec3 addi(Vec3 v) {
 		this.x += v.x;
 		this.y += v.y;
@@ -210,5 +216,17 @@ public class Vec3 {
 		float y = Float.parseFloat(st.nextToken());
 		float z = Float.parseFloat(st.nextToken());
 		return new Vec3(x, y, z);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof Vec3)) {
+			return false;
+		}
+		Vec3 v = (Vec3) o;
+		return v.x == this.x && v.y == this.y && v.z == this.z;
 	}
 }
