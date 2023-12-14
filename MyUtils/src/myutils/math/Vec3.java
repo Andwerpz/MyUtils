@@ -99,6 +99,13 @@ public class Vec3 {
 		this.z *= val;
 		return this;
 	}
+	
+	public Vec3 muli(double val) {
+		this.x *= val;
+		this.y *= val;
+		this.z *= val;
+		return this;
+	}
 
 	public Vec3 mul(float val) {
 		Vec3 result = new Vec3(this);
