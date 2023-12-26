@@ -55,7 +55,7 @@ public class Vec4 {
 
 	@Override
 	public String toString() {
-		return this.x + ", " + this.y + ", " + this.z + ", " + this.w;
+		return "[" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + "]";
 	}
 
 }

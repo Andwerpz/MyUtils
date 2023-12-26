@@ -99,7 +99,7 @@ public class Vec3 {
 		this.z *= val;
 		return this;
 	}
-	
+
 	public Vec3 muli(double val) {
 		this.x *= val;
 		this.y *= val;
@@ -214,7 +214,7 @@ public class Vec3 {
 
 	@Override
 	public String toString() {
-		return this.x + " " + this.y + " " + this.z;
+		return "[" + this.x + ", " + this.y + ", " + this.z + "]";
 	}
 
 	public static Vec3 parseVec3(String s) {

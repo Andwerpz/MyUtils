@@ -48,6 +48,26 @@ public class MathUtils {
 	}
 
 	/**
+	 * Rounds floating point down to the closest int 
+	 * 
+	 * @param val
+	 * @return
+	 */
+	public static int floor(float val) {
+		return (int) Math.floor(val);
+	}
+
+	/**
+	 * Rounds floating point up to closest int
+	 * 
+	 * @param val
+	 * @return
+	 */
+	public static int ceil(float val) {
+		return (int) Math.ceil(val);
+	}
+
+	/**
 	 * Linearly interpolates between two points
 	 * 
 	 * @param x1
