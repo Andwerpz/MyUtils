@@ -3,6 +3,8 @@ package myutils.math;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import myutils.misc.Pair;
+
 public class MathUtils {
 
 	public static final float EPSILON = 0.00001f;
@@ -1567,6 +1569,61 @@ public class MathUtils {
 			return (float) (0.25f * Math.pow(2 - x, 3));
 		}
 		return 0;
+	}
+
+	// -- NUMBER THEORY --
+
+	private static Pair<int[], ArrayList<Integer>> _primeSieve(int n) {
+		int[] lp = new int[n + 1];
+		ArrayList<Integer> primes = new ArrayList<>();
+		for (int i = 2; i <= n; i++) {
+			if (lp[i] == 0) {
+				lp[i] = i;
+				primes.add(i);
+			}
+			for (int j = 0; i * primes.get(j) <= n; j++) {
+				lp[i * primes.get(j)] = primes.get(j);
+				if (primes.get(j) == lp[i]) {
+					break;
+				}
+			}
+		}
+		return new Pair<>(lp, primes);
+	}
+
+	/**
+	 * Generates a list of all primes in the range [0, n]. 
+	 * 
+	 * Complexity: O(n)
+	 * @param n
+	 * @return
+	 */
+	public static ArrayList<Integer> primeSieve(int n) {
+		return _primeSieve(n).second;
+	}
+
+	/**
+	 * For all integers in the range [0, n], generates the lowest prime factor for that integer. 
+	 * 
+	 * Complexity: O(n)
+	 * @param n
+	 * @return
+	 */
+	public static int[] calculateRangeLPF(int n) {
+		return _primeSieve(n).first;
+	}
+
+	/**
+	 * Cantor pairing function, uniquely maps a pair of integers back to the set of integers. 
+	 * Mod is included for the purpose of hashing. 
+	 * 
+	 * @param a
+	 * @param b
+	 * @param m
+	 * @return
+	 */
+	public static long cantor(long a, long b, long m) {
+		return ((a + b) * (a + b + 1) / 2 + b) % m;
 	}
 
 }

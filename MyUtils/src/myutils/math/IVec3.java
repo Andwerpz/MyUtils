@@ -16,6 +16,12 @@ public class IVec3 {
 		this.z = z;
 	}
 
+	public IVec3(int val) {
+		this.x = val;
+		this.y = val;
+		this.z = val;
+	}
+
 	public IVec3(IVec3 other) {
 		this.x = other.x;
 		this.y = other.y;
@@ -104,6 +110,12 @@ public class IVec3 {
 		}
 		IVec3 otherVec = (IVec3) other;
 		return this.x == otherVec.x && this.y == otherVec.y && this.z == otherVec.z;
+	}
+
+	@Override
+	public int hashCode() {
+		long mod = (long) (1e9 + 7);
+		return (int) MathUtils.cantor(this.x, MathUtils.cantor(this.y, this.z, mod), mod);
 	}
 
 	@Override
