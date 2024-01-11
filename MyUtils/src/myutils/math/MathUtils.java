@@ -68,6 +68,62 @@ public class MathUtils {
 	public static int ceil(float val) {
 		return (int) Math.ceil(val);
 	}
+	
+	/**
+	 * Returns a component wise minimum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static Vec3 min(Vec3 a, Vec3 b) {
+		Vec3 ret = new Vec3();
+		ret.x = Math.min(a.x, b.x);
+		ret.y = Math.min(a.y, b.y);
+		ret.z = Math.min(a.z, b.z);
+		return ret;
+	}
+	
+	/**
+	 * Returns a component wise maximum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static Vec3 max(Vec3 a, Vec3 b) {
+		Vec3 ret = new Vec3();
+		ret.x = Math.max(a.x, b.x);
+		ret.y = Math.max(a.y, b.y);
+		ret.z = Math.max(a.z, b.z);
+		return ret;
+	}
+	
+	/**
+	 * Returns a component wise minimum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static Vec3 min(Vec3[] arr) {
+		Vec3 ret = arr[0];
+		for(int i = 1; i < arr.length; i++) {
+			ret = min(ret, arr[i]);
+		}
+		return ret;
+	}
+	
+	/**
+	 * Returns a component wise maximum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static Vec3 max(Vec3[] arr) {
+		Vec3 ret = arr[0];
+		for(int i = 1; i < arr.length; i++) {
+			ret = max(ret, arr[i]);
+		}
+		return ret;
+	}
 
 	/**
 	 * Linearly interpolates between two points

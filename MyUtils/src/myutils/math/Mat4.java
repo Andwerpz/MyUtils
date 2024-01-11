@@ -377,12 +377,6 @@ public class Mat4 {
 	}
 
 	public Vec3 mul(Vec3 vec, float w) {
-		//		return new Vec3(
-		//			vec.x * mat[0][0] + vec.y * mat[1][0] + vec.z * mat[2][0] + w * mat[3][0],
-		//			vec.x * mat[0][1] + vec.y * mat[1][1] + vec.z * mat[2][1] + w * mat[3][1],
-		//			vec.x * mat[0][2] + vec.y * mat[1][2] + vec.z * mat[2][2] + w * mat[3][2]
-		//		);
-
 		return new Vec3(vec.x * mat[0][0] + vec.y * mat[0][1] + vec.z * mat[0][2] + w * mat[0][3], vec.x * mat[1][0] + vec.y * mat[1][1] + vec.z * mat[1][2] + w * mat[1][3], vec.x * mat[2][0] + vec.y * mat[2][1] + vec.z * mat[2][2] + w * mat[2][3]);
 	}
 
@@ -401,6 +395,14 @@ public class Mat4 {
 	public Mat4 addi(Mat4 matrix) {
 		this.mat = this.add(matrix).mat;
 		return this;
+	}
+	
+	public float[] toFloatArray() {
+		float[] arr = new float[16];
+		for(int i = 0; i < 16; i++) {
+			arr[i] = this.mat[i / 4][i % 4];
+		}
+		return arr;
 	}
 
 	@Override
