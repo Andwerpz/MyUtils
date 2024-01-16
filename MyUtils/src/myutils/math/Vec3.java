@@ -42,6 +42,9 @@ public class Vec3 {
 	}
 
 	public Vec3(Vec3 v) {
+		if (v == null) {
+			return;
+		}
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
