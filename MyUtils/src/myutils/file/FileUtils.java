@@ -48,29 +48,17 @@ public class FileUtils {
 		return file;
 	}
 
+	public static String loadAsString(String filepath) {
+		return readFileToString(loadFile(filepath));
+	}
+
 	public static File loadFileRelative(String filepath) {
 		File file = loadFile(FileUtils.generateAbsoluteFilepath(filepath));
 		return file;
 	}
 
-	public static String loadAsStringRelative(String file) {
-		StringBuilder result = new StringBuilder();
-		InputStream is;
-		try {
-			System.out.println("LOADING FILE: " + file);
-			is = FileUtils.class.getResourceAsStream(file);
-			BufferedReader fin = new BufferedReader(new InputStreamReader(is));
-			String buffer = "";
-			while ((buffer = fin.readLine()) != null) {
-				result.append(buffer + '\n');
-			}
-			fin.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return result.toString();
+	public static String loadAsStringRelative(String filepath) {
+		return readFileToString(loadFileRelative(filepath));
 	}
 
 	public static String readFileToString(File f) {

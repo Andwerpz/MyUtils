@@ -3,8 +3,10 @@ package myutils.file;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 
@@ -48,7 +50,7 @@ public class JarUtils {
 	 * @return
 	 */
 	public static byte[] loadByteBuffer(String filepath) {
-		System.out.println("LOADING JAR BYTE BUFFER: " + filepath);
+		System.out.print("LOADING JAR BYTE BUFFER: " + filepath);
 		try {
 			InputStream is = JarUtils.loadInputStream(filepath);
 			byte[] buffer;
@@ -72,7 +74,7 @@ public class JarUtils {
 	 * @return
 	 */
 	public static Font loadFont(String filepath) {
-		System.out.println("LOADING JAR FONT: " + filepath);
+		System.out.print("LOADING JAR FONT: " + filepath);
 		try {
 			InputStream is = JarUtils.loadInputStream(filepath);
 			Font font = Font.createFont(Font.TRUETYPE_FONT, is);
@@ -81,6 +83,32 @@ public class JarUtils {
 			return font;
 		}
 		catch (IOException | FontFormatException e) {
+			System.err.println(" FAILED");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Loads string from resource package
+	 * @param filepath
+	 * @return
+	 */
+	public static String loadString(String filepath) {
+		System.out.print("LOADING JAR STRING: " + filepath);
+		try {
+			StringBuilder result = new StringBuilder();
+			InputStream is = JarUtils.loadInputStream(filepath);
+			BufferedReader fin = new BufferedReader(new InputStreamReader(is));
+			String buffer = "";
+			while ((buffer = fin.readLine()) != null) {
+				result.append(buffer + '\n');
+			}
+			fin.close();
+			System.out.println(" SUCCESS");
+			return result.toString();
+		}
+		catch (IOException e) {
 			System.err.println(" FAILED");
 			e.printStackTrace();
 		}
