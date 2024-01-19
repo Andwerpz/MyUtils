@@ -188,13 +188,13 @@ public class Mat4 {
 
 	/**
 	 * Returns a matrix that will rotate around the z axis
-	 * @param rad
+	 * @param d
 	 * @return
 	 */
-	public static Mat4 rotateZ(float rad) {
+	public static Mat4 rotateZ(float d) {
 		Mat4 result = identity();
-		float cos = (float) Math.cos(rad);
-		float sin = (float) Math.sin(rad);
+		float cos = (float) Math.cos(d);
+		float sin = (float) Math.sin(d);
 
 		result.mat[0][0] = cos;
 		result.mat[1][0] = -sin;
@@ -396,10 +396,68 @@ public class Mat4 {
 		this.mat = this.add(matrix).mat;
 		return this;
 	}
-	
+
+	/**
+	 * Assuming this matrix represents an affine transformation, inverts it. 
+	 * 
+	 * If the determinant is 0, then returns false. 
+	 * @return
+	 */
+	public boolean invertAffine() {
+		float s0 = this.mat[0][0] * this.mat[1][1] - this.mat[1][0] * this.mat[0][1];
+		float s1 = this.mat[0][0] * this.mat[1][2] - this.mat[1][0] * this.mat[0][2];
+		float s2 = this.mat[0][0] * this.mat[1][3] - this.mat[1][0] * this.mat[0][3];
+		float s3 = this.mat[0][1] * this.mat[1][2] - this.mat[1][1] * this.mat[0][2];
+		float s4 = this.mat[0][1] * this.mat[1][3] - this.mat[1][1] * this.mat[0][3];
+		float s5 = this.mat[0][2] * this.mat[1][3] - this.mat[1][2] * this.mat[0][3];
+
+		float c5 = this.mat[2][2] * this.mat[3][3] - this.mat[3][2] * this.mat[2][3];
+		float c4 = this.mat[2][1] * this.mat[3][3] - this.mat[3][1] * this.mat[2][3];
+		float c3 = this.mat[2][1] * this.mat[3][2] - this.mat[3][1] * this.mat[2][2];
+		float c2 = this.mat[2][0] * this.mat[3][3] - this.mat[3][0] * this.mat[2][3];
+		float c1 = this.mat[2][0] * this.mat[3][2] - this.mat[3][0] * this.mat[2][2];
+		float c0 = this.mat[2][0] * this.mat[3][1] - this.mat[3][0] * this.mat[2][1];
+
+		// Should check for 0 determinant
+		float det = s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0;
+		if (det == 0) {
+			this.transpose();
+			return false;
+		}
+		float invdet = 1.0f / det;
+
+		float[][] m = new float[4][4];
+		m[0][0] = (this.mat[1][1] * c5 - this.mat[1][2] * c4 + this.mat[1][3] * c3) * invdet;
+		m[0][1] = (-this.mat[0][1] * c5 + this.mat[0][2] * c4 - this.mat[0][3] * c3) * invdet;
+		m[0][2] = (this.mat[3][1] * s5 - this.mat[3][2] * s4 + this.mat[3][3] * s3) * invdet;
+		m[0][3] = (-this.mat[2][1] * s5 + this.mat[2][2] * s4 - this.mat[2][3] * s3) * invdet;
+
+		m[1][0] = (-this.mat[1][0] * c5 + this.mat[1][2] * c2 - this.mat[1][3] * c1) * invdet;
+		m[1][1] = (this.mat[0][0] * c5 - this.mat[0][2] * c2 + this.mat[0][3] * c1) * invdet;
+		m[1][2] = (-this.mat[3][0] * s5 + this.mat[3][2] * s2 - this.mat[3][3] * s1) * invdet;
+		m[1][3] = (this.mat[2][0] * s5 - this.mat[2][2] * s2 + this.mat[2][3] * s1) * invdet;
+
+		m[2][0] = (this.mat[1][0] * c4 - this.mat[1][1] * c2 + this.mat[1][3] * c0) * invdet;
+		m[2][1] = (-this.mat[0][0] * c4 + this.mat[0][1] * c2 - this.mat[0][3] * c0) * invdet;
+		m[2][2] = (this.mat[3][0] * s4 - this.mat[3][1] * s2 + this.mat[3][3] * s0) * invdet;
+		m[2][3] = (-this.mat[2][0] * s4 + this.mat[2][1] * s2 - this.mat[2][3] * s0) * invdet;
+
+		m[3][0] = (-this.mat[1][0] * c3 + this.mat[1][1] * c1 - this.mat[1][2] * c0) * invdet;
+		m[3][1] = (this.mat[0][0] * c3 - this.mat[0][1] * c1 + this.mat[0][2] * c0) * invdet;
+		m[3][2] = (-this.mat[3][0] * s3 + this.mat[3][1] * s1 - this.mat[3][2] * s0) * invdet;
+		m[3][3] = (this.mat[2][0] * s3 - this.mat[2][1] * s1 + this.mat[2][2] * s0) * invdet;
+
+		this.mat = m;
+		return true;
+	}
+
+	/**
+	 * Row major order. Keep in mind, OpenGL wants column major
+	 * @return
+	 */
 	public float[] toFloatArray() {
 		float[] arr = new float[16];
-		for(int i = 0; i < 16; i++) {
+		for (int i = 0; i < 16; i++) {
 			arr[i] = this.mat[i / 4][i % 4];
 		}
 		return arr;

@@ -14,6 +14,16 @@ public class MathUtils {
 	// -- GENERAL --
 
 	/**
+	 * Generates random float between low and high
+	 * @param low
+	 * @param high
+	 * @return
+	 */
+	public static float random(float low, float high) {
+		return (float) (Math.random() * (high - low) + low);
+	}
+
+	/**
 	 * Takes in a value, and returns it clamped to two other inputs
 	 * 
 	 * @param low
@@ -68,7 +78,7 @@ public class MathUtils {
 	public static int ceil(float val) {
 		return (int) Math.ceil(val);
 	}
-	
+
 	/**
 	 * Returns a component wise minimum vector
 	 * @param a
@@ -82,7 +92,7 @@ public class MathUtils {
 		ret.z = Math.min(a.z, b.z);
 		return ret;
 	}
-	
+
 	/**
 	 * Returns a component wise maximum vector
 	 * @param a
@@ -96,7 +106,7 @@ public class MathUtils {
 		ret.z = Math.max(a.z, b.z);
 		return ret;
 	}
-	
+
 	/**
 	 * Returns a component wise minimum vector
 	 * @param a
@@ -105,12 +115,12 @@ public class MathUtils {
 	 */
 	public static Vec3 min(Vec3[] arr) {
 		Vec3 ret = arr[0];
-		for(int i = 1; i < arr.length; i++) {
+		for (int i = 1; i < arr.length; i++) {
 			ret = min(ret, arr[i]);
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * Returns a component wise maximum vector
 	 * @param a
@@ -119,7 +129,7 @@ public class MathUtils {
 	 */
 	public static Vec3 max(Vec3[] arr) {
 		Vec3 ret = arr[0];
-		for(int i = 1; i < arr.length; i++) {
+		for (int i = 1; i < arr.length; i++) {
 			ret = max(ret, arr[i]);
 		}
 		return ret;
