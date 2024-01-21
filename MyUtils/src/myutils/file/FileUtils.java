@@ -48,7 +48,7 @@ public class FileUtils {
 		return file;
 	}
 
-	public static String loadAsString(String filepath) {
+	public static String loadString(String filepath) {
 		return readFileToString(loadFile(filepath));
 	}
 
@@ -57,7 +57,7 @@ public class FileUtils {
 		return file;
 	}
 
-	public static String loadAsStringRelative(String filepath) {
+	public static String loadStringRelative(String filepath) {
 		return readFileToString(loadFileRelative(filepath));
 	}
 

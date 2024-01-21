@@ -32,11 +32,25 @@ public class Vec4 {
 		this.w = w;
 	}
 
+	public Vec4(Vec2 a, Vec2 b) {
+		this.x = a.x;
+		this.y = a.y;
+		this.z = b.x;
+		this.w = b.y;
+	}
+
 	public Vec4(float a) {
 		this.x = a;
 		this.y = a;
 		this.z = a;
 		this.w = a;
+	}
+
+	public Vec4(double a) {
+		this.x = (float) a;
+		this.y = (float) a;
+		this.z = (float) a;
+		this.w = (float) a;
 	}
 
 	public void set(Vec4 v) {
