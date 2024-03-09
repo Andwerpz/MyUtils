@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
@@ -105,6 +107,9 @@ public class FileUtils {
 
 	public static String getFileExtension(String path) {
 		int lastPeriod = path.lastIndexOf('.');
+		if (lastPeriod == -1) {
+			return null;
+		}
 		return path.substring(lastPeriod + 1);
 	}
 
@@ -147,6 +152,16 @@ public class FileUtils {
 		fd.dispose();
 		fd.getOwner().dispose(); //have to do because some mem leak issues :shrug:
 		return f;
+	}
+
+	public static boolean isFilepathValid(String filepath) {
+		try {
+			Paths.get(filepath);
+		}
+		catch (InvalidPathException ex) {
+			return false;
+		}
+		return true;
 	}
 
 }

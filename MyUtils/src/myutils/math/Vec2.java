@@ -449,4 +449,12 @@ public class Vec2 {
 		return "[" + this.x + ", " + this.y + "]";
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof Vec2)) {
+			return false;
+		}
+		Vec2 v = (Vec2) other;
+		return this.x == v.x && this.y == v.y;
+	}
 }

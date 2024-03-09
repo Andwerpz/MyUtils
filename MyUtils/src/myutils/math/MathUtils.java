@@ -1,7 +1,10 @@
 package myutils.math;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Stack;
 
 import myutils.misc.Pair;
 
@@ -21,6 +24,16 @@ public class MathUtils {
 	 */
 	public static float random(float low, float high) {
 		return (float) (Math.random() * (high - low) + low);
+	}
+
+	/**
+	 * Generates a random vector in the bounding box defined by the two inputs
+	 * @param low
+	 * @param high
+	 * @return
+	 */
+	public static Vec3 random(Vec3 low, Vec3 high) {
+		return new Vec3(random(low.x, high.x), random(low.y, high.y), random(low.z, high.z));
 	}
 
 	/**
@@ -56,6 +69,18 @@ public class MathUtils {
 	 * @return
 	 */
 	public static int clamp(int low, int high, int val) {
+		return val < low ? low : (val > high ? high : val);
+	}
+
+	/**
+	 * Takes in a value, and returns it clamped to two other inputs
+	 * 
+	 * @param low
+	 * @param high
+	 * @param val
+	 * @return
+	 */
+	public static long clamp(long low, long high, long val) {
 		return val < low ? low : (val > high ? high : val);
 	}
 
@@ -148,6 +173,20 @@ public class MathUtils {
 	public static float lerp(float x1, float t1, float x2, float t2, float t3) {
 		float v = (x2 - x1) / (t2 - t1);
 		return x1 + (t3 - t1) * v;
+	}
+
+	/**
+	 * Linear interpolation between two points
+	 * @param v1
+	 * @param t1
+	 * @param v2
+	 * @param t2
+	 * @param t3
+	 * @return
+	 */
+	public static Vec2 lerp(Vec2 v1, float t1, Vec2 v2, float t2, float t3) {
+		Vec2 v = (v2.sub(v1)).divi(t2 - t1);
+		return v1.add(v.mul(t3 - t1));
 	}
 
 	/**
@@ -343,18 +382,26 @@ public class MathUtils {
 	}
 
 	/**
-	 * Calculates determinant of 3 vectors
-	 * 
-	 * Could be useful when determining if a right or left turn occurred at vector b. 
-	 * 
+	 * Returns difference between polar angle of b -> c from a -> b
+	 * Positive orientation means CCW turn
 	 * @param a
 	 * @param b
 	 * @param c
 	 * @return
 	 */
-
-	public static float determinant(Vec2 a, Vec2 b, Vec2 c) {
+	public static float orientation(Vec2 a, Vec2 b, Vec2 c) {
 		return (b.x - a.x) * (c.y - b.y) - (c.x - b.x) * (b.y - a.y);
+	}
+
+	/**
+	 * Returns true if the three vectors are collinear
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @return
+	 */
+	public static boolean collinear(Vec2 a, Vec2 b, Vec2 c) {
+		return orientation(a, b, c) == 0;
 	}
 
 	/**
@@ -363,14 +410,13 @@ public class MathUtils {
 	 * @param points
 	 * @return
 	 */
-
 	public static boolean isCounterClockwiseWinding(ArrayList<Vec2> points) {
 		float sum = 0;
 		for (int i = 0; i < points.size(); i++) {
 			Vec2 a = points.get(i);
 			Vec2 b = points.get((i + 1) % points.size());
 			Vec2 c = points.get((i + 2) % points.size());
-			float det = determinant(a, b, c);
+			float det = orientation(a, b, c);
 			sum += det;
 		}
 		return sum > 0;
@@ -382,14 +428,13 @@ public class MathUtils {
 	 * @param points
 	 * @return
 	 */
-
 	public static boolean isConvex(ArrayList<Vec2> points) {
 		boolean clockwise = !isCounterClockwiseWinding(points);
 		for (int i = 0; i < points.size(); i++) {
 			Vec2 a = points.get(i);
 			Vec2 b = points.get((i + 1) % points.size());
 			Vec2 c = points.get((i + 2) % points.size());
-			float det = determinant(a, b, c);
+			float det = orientation(a, b, c);
 			if (det < 0 ^ clockwise) {
 				return false;
 			}
@@ -412,7 +457,6 @@ public class MathUtils {
 	 * @param points
 	 * @return
 	 */
-
 	public static boolean isSimplePolygon(ArrayList<Vec2> points) {
 		float epsilon = 0.01f;
 
@@ -440,17 +484,27 @@ public class MathUtils {
 
 	/**
 	 * Takes in a polygon and a point, and returns true if the point is within the polygon. 
-	 * 
-	 * TODO implement O(logn) version using bsearch
-	 * 
 	 * @param poly
 	 * @param p
 	 * @return
 	 */
+	public static boolean pointInsidePolygon(Vec2[] poly, Vec2 p) {
+		ArrayList<Vec2> list = new ArrayList<>();
+		for (Vec2 v : poly) {
+			list.add(v);
+		}
+		return pointInsidePolygon(list, p);
+	}
 
+	/**
+	 * Takes in a polygon and a point, and returns true if the point is within the polygon. 
+	 * TODO implement O(logn) version using bsearch
+	 * @param poly
+	 * @param p
+	 * @return
+	 */
 	public static boolean pointInsidePolygon(ArrayList<Vec2> poly, Vec2 p) {
 		//if a point is inside a polygon, then a ray drawn from the point must intersect the polygon an odd amount of times. 
-
 		Vec2 rayOrigin = new Vec2(p);
 		Vec2 rayDir = new Vec2(1, 0).rotate((float) (Math.random() * Math.PI * 2));
 
@@ -463,111 +517,83 @@ public class MathUtils {
 				cnt++;
 			}
 		}
-
 		return cnt % 2 == 1;
 	}
 
 	/**
-	 * Wrapper method to calculate convex hull
-	 * 
-	 * @param verts
+	 * Takes in a collection of points, and returns the convex hull fitting these points in CCW winding.  
+	 * Should be able to handle degenerate cases such as lines and single points.
+	 * @param pts
 	 * @return
 	 */
-
-	public static ArrayList<Vec2> calculateConvexHull(ArrayList<Vec2> verts) {
-		Vec2[] v = Vec2.arrayOf(verts.size());
-		for (int i = 0; i < verts.size(); i++) {
-			v[i].set(verts.get(i));
+	public static ArrayList<Vec2> calculateConvexHull(Vec2[] pts) {
+		ArrayList<Vec2> tmp_list = new ArrayList<>();
+		for (Vec2 v : pts) {
+			tmp_list.add(new Vec2(v));
 		}
-		Vec2[] ans = calculateConvexHull(v);
-		ArrayList<Vec2> ret = new ArrayList<>();
-		for (int i = 0; i < ans.length; i++) {
-			ret.add(ans[i]);
-		}
-		return ret;
+		return calculateConvexHull(tmp_list);
 	}
 
 	/**
-	 * Given a list of points, will calculate convex hull
-	 * 
-	 * @param verts
+	 * Takes in a collection of points, and returns the convex hull fitting these points in CCW winding
+	 * Should be able to handle degenerate cases such as lines and single points.
+	 * @param pts
 	 * @return
 	 */
+	public static ArrayList<Vec2> calculateConvexHull(ArrayList<Vec2> pts) {
+		ArrayList<Vec2> ans = new ArrayList<>();
+		if (pts.size() == 0) {
+			return ans;
+		}
+		if (pts.size() == 1) {
+			ans.add(pts.get(0));
+			return ans;
+		}
 
-	public static Vec2[] calculateConvexHull(Vec2[] verts) {
-		// Find the right most point on the hull
-		int rightMost = 0;
-		int vertexCount = 0;
-		double highestXCoord = verts[0].x;
-		for (int i = 1; i < verts.length; ++i) {
-			double x = verts[i].x;
-
-			if (x > highestXCoord) {
-				highestXCoord = x;
-				rightMost = i;
-			}
-			// If matching x then take farthest negative y
-			else if (x == highestXCoord) {
-				if (verts[i].y < verts[rightMost].y) {
-					rightMost = i;
-				}
+		//find top-right most element
+		final Vec2 pivot = new Vec2(pts.get(0));
+		for (int i = 1; i < pts.size(); i++) {
+			Vec2 next = new Vec2(pts.get(i));
+			if (next.y < pivot.y || (next.y == pivot.y && next.x < pivot.x)) {
+				pivot.set(next);
 			}
 		}
 
-		int[] hull = new int[verts.length];
-		int outCount = 0;
-		int indexHull = rightMost;
-
-		for (;;) {
-			hull[outCount] = indexHull;
-
-			// Search for next index that wraps around the hull
-			// by computing cross products to find the most counter-clockwise
-			// vertex in the set, given the previos hull index
-			int nextHullIndex = 0;
-			for (int i = 1; i < verts.length; ++i) {
-				// Skip if same coordinate as we need three unique
-				// points in the set to perform a cross product
-				if (nextHullIndex == indexHull) {
-					nextHullIndex = i;
-					continue;
-				}
-
-				// Cross every set of three unique vertices
-				// Record each counter clockwise third vertex and add
-				// to the output hull
-				// See : http://www.oocities.org/pcgpe/math2d.html
-				Vec2 e1 = verts[nextHullIndex].sub(verts[hull[outCount]]);
-				Vec2 e2 = verts[i].sub(verts[hull[outCount]]);
-				double c = Vec2.cross(e1, e2);
-				if (c < 0.0f) {
-					nextHullIndex = i;
-				}
-
-				// Cross product is zero then e vectors are on same line
-				// therefore want to record vertex farthest along that line
-				if (c == 0.0f && e2.lengthSq() > e1.lengthSq()) {
-					nextHullIndex = i;
-				}
+		//sort points according to angle from pivot
+		Collections.sort(pts, (Vec2 a, Vec2 b) -> {
+			float o = orientation(pivot, a, b);
+			if (o == 0) {
+				//tiebreak by distance to pivot
+				return Float.compare(pivot.distanceSq(a), pivot.distanceSq(b));
 			}
+			return o < 0 ? -1 : 1;
+		});
 
-			++outCount;
-			indexHull = nextHullIndex;
-
-			// Conclude algorithm upon wrap-around
-			if (nextHullIndex == rightMost) {
-				vertexCount = outCount;
-				break;
+		ArrayList<Vec2> st = new ArrayList<>();
+		for (int i = 0; i < pts.size(); i++) {
+			while (st.size() > 1) {
+				float o = orientation(st.get(st.size() - 2), st.get(st.size() - 1), pts.get(i));
+				if (o < 0) {
+					break;
+				}
+				st.remove(st.size() - 1);
 			}
+			st.add(pts.get(i));
 		}
 
-		Vec2[] ans = Vec2.arrayOf(vertexCount);
-
-		// Copy vertices into shape's vertices
-		for (int i = 0; i < vertexCount; ++i) {
-			ans[i].set(verts[hull[i]]);
+		for (int i = 0; i < st.size(); i++) {
+			Vec2 v0 = st.get(i);
+			Vec2 v1 = st.get((i + 1) % st.size());
+			if (v0.x == v1.x && v0.y == v1.y) {
+				continue;
+			}
+			ans.add(v0);
+		}
+		if (ans.size() == 0) {
+			ans.add(pivot);
 		}
 
+		Collections.reverse(ans);
 		return ans;
 	}
 
@@ -585,7 +611,6 @@ public class MathUtils {
 	 * @param points
 	 * @return
 	 */
-
 	public static ArrayList<int[]> calculateConvexPartition(ArrayList<Vec2> points) {
 		ArrayList<int[]> ans = new ArrayList<>();
 		ArrayList<int[]> tri = calculateTrianglePartition(points);
@@ -693,12 +718,11 @@ public class MathUtils {
 	 * try not to have 3 adjacent colinear points in the input polygon or else a degenerate triangle
 	 * will be produced
 	 * 
-	 * Complexity: O(n^2)
+	 * Complexity: O(n^3)
 	 * 
 	 * @param points
 	 * @return
 	 */
-
 	public static ArrayList<int[]> calculateTrianglePartition(ArrayList<Vec2> points) {
 		boolean clockwise = !MathUtils.isCounterClockwiseWinding(points);
 		int n = points.size();
@@ -730,7 +754,7 @@ public class MathUtils {
 				}
 
 				//if angle is not acute, then it's not a triangle
-				if (MathUtils.determinant(points.get(next[0]), points.get(next[1]), points.get(next[2])) < 0 ^ clockwise) {
+				if (orientation(points.get(next[0]), points.get(next[1]), points.get(next[2])) < 0 ^ clockwise) {
 					continue;
 				}
 
@@ -752,6 +776,34 @@ public class MathUtils {
 		}
 
 		return ans;
+	}
+
+	/**
+	 * Returns the area covered by the polygon. Winding order doesn't matter
+	 * @param poly
+	 * @return
+	 */
+	public static float polygonArea(Vec2[] poly) {
+		ArrayList<Vec2> list = new ArrayList<>();
+		for (Vec2 v : poly) {
+			list.add(v);
+		}
+		return polygonArea(list);
+	}
+
+	/**
+	 * Returns the area covered by the polygon. Winding order doesn't matter
+	 * @param poly
+	 * @return
+	 */
+	public static float polygonArea(ArrayList<Vec2> poly) {
+		float area = 0;
+		for (int i = 0; i < poly.size(); i++) {
+			Vec2 v0 = poly.get(i);
+			Vec2 v1 = poly.get((i + 1) % poly.size());
+			area += v0.cross(v1);
+		}
+		return Math.abs(area / 2.0f);
 	}
 
 	/**
@@ -863,7 +915,7 @@ public class MathUtils {
 	/**
 	 * Takes in two line segments, and returns the point of intersection, if it exists. Null otherwise.
 	 * 
-	 * If the two line segments are the same, then returns 
+	 * If the two line segments are the same, then returns some point on the line
 	 * 
 	 * @param a0
 	 * @param a1
@@ -898,10 +950,10 @@ public class MathUtils {
 		{
 			Vec2 ai = new Vec2(a0, lineIntersection);
 			Vec2 da = new Vec2(a0, a1);
-			if (ai.dot(da) < 0) {
+			if (ai.dot(da) < 1e-3) {
 				return null;
 			}
-			if (ai.lengthSq() > da.lengthSq()) {
+			if (ai.lengthSq() > da.lengthSq() - 1e-3) {
 				return null;
 			}
 		}
@@ -909,10 +961,10 @@ public class MathUtils {
 		{
 			Vec2 bi = new Vec2(b0, lineIntersection);
 			Vec2 db = new Vec2(b0, b1);
-			if (bi.dot(db) < 0) {
+			if (bi.dot(db) < 1e-3) {
 				return null;
 			}
-			if (bi.lengthSq() > db.lengthSq()) {
+			if (bi.lengthSq() > db.lengthSq() - 1e-3) {
 				return null;
 			}
 		}
@@ -930,12 +982,16 @@ public class MathUtils {
 	 * @param b1
 	 * @return
 	 */
-
 	public static Vec2 ray_lineSegmentIntersect(Vec2 ray_origin, Vec2 ray_dir, Vec2 b0, Vec2 b1) {
 		//calculate intersection of line segment and ray extended into lines
 		Vec2 lineIntersection = line_lineIntersect(ray_origin, ray_origin.add(ray_dir), b0, b1);
 
 		if (lineIntersection == null) {
+			return null;
+		}
+
+		//check if intersection point is behind ray
+		if (Vec2.dot(ray_dir, new Vec2(ray_origin, lineIntersection)) < 0) {
 			return null;
 		}
 
@@ -1050,34 +1106,15 @@ public class MathUtils {
 		float mExp1 = 0;
 		float cnst1 = 0;
 
-		//v is the vector between the two closest points of a and b. 
-		//v.x = (a0.x + n * d0.x) - (b0.x + m * d1.x);
-		//v.y = (a0.y + n * d0.y) - (b0.y + m * d1.y);
-		//v.z = (a0.z + n * d0.z) - (b0.z + m * d1.z);
-
-		//v.dot(d0) = 0
-		//v.dot(d1) = 0
-
-		//((a0.x + n * d0.x) - (b0.x + m * d1.x)) * d0.x + 
-		//((a0.y + n * d0.y) - (b0.y + m * d1.y)) * d0.y + 
-		//((a0.z + n * d0.z) - (b0.z + m * d1.z)) * d0.z = 0
-
 		nExp0 += d0.x * d0.x + d0.y * d0.y + d0.z * d0.z;
 		mExp0 -= d1.x * d0.x + d1.y * d0.y + d1.z * d0.z;
 		cnst0 -= a0.x * d0.x + a0.y * d0.y + a0.z * d0.z;
 		cnst0 += b0.x * d0.x + b0.y * d0.y + b0.z * d0.z;
 
-		//((a0.x + n * d0.x) - (b0.x + m * d1.x)) * d1.x + 
-		//((a0.y + n * d0.y) - (b0.y + m * d1.y)) * d1.y + 
-		//((a0.z + n * d0.z) - (b0.z + m * d1.z)) * d1.z = 0
-
 		nExp1 += d0.x * d1.x + d0.y * d1.y + d0.z * d1.z;
 		mExp1 -= d1.x * d1.x + d1.y * d1.y + d1.z * d1.z;
 		cnst1 -= a0.x * d1.x + a0.y * d1.y + a0.z * d1.z;
 		cnst1 += b0.x * d1.x + b0.y * d1.y + b0.z * d1.z;
-
-		//nExp0 * n + mExp0 * m = cnst0
-		//nExp1 * n + mExp1 * m = cnst1
 
 		//cancel out nExp0
 		float ratio = nExp0 / nExp1;

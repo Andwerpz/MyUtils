@@ -23,7 +23,7 @@ public class SVGReader {
 		//TODO add support for more svg elements. 
 
 		if (root.getName().equals("path")) {
-			SVGPath path = new SVGPath(root.getAttributeContent("d"));
+			SVGPath path = new SVGPath(root.getAttributeContent("id"), root.getAttributeContent("d"));
 			ans.add(path);
 		}
 

@@ -9,14 +9,15 @@ import myutils.math.Vec2;
 import myutils.misc.Pair;
 
 public class SVGPath extends SVGElement {
-
 	//upper case means absolute coordinates
 	//lower case means relative coordinates to the previous cursor position. 
 
 	//my implementation converts all commands that refer to previous commands; all lowercase commands + T and S, into commands
 	//that don't refer to other ones. 
 
-	//TODO support elliptical arc curves
+	//TODO 
+	// - support elliptical arc curves
+	//   - this is difficult because there is no good cubic bezier approximation of an elliptical arc
 
 	//command length in number of arguments
 	private static HashMap<Character, Integer> cmdLength = new HashMap<Character, Integer>() {
@@ -44,10 +45,14 @@ public class SVGPath extends SVGElement {
 		}
 	};
 
-	private List<Pair<Character, List<Float>>> pathElements;
-	private List<Vec2[]> cubicCurves;
+	private String id;
 
-	protected SVGPath(String content) {
+	private List<Pair<Character, List<Float>>> pathElements;
+
+	//curves are seperated by M commands, where we 'lift' the pen
+	private List<List<Vec2[]>> cubicCurves;
+
+	protected SVGPath(String id, String content) {
 		super(SVGElement.TYPE_PATH);
 
 		//add some padding. 
@@ -320,6 +325,7 @@ public class SVGPath extends SVGElement {
 
 		//convert all commands into cubic bezier curves
 		this.cubicCurves = new ArrayList<>();
+		List<Vec2[]> c_curve = new ArrayList<>();
 		{
 			float cx = 0;
 			float cy = 0;
@@ -328,6 +334,10 @@ public class SVGPath extends SVGElement {
 				switch (pathElements.get(i).first) {
 				//move
 				case 'M': {
+					if (c_curve.size() != 0) {
+						this.cubicCurves.add(c_curve);
+						c_curve = new ArrayList<>();
+					}
 					cx = coords.get(0);
 					cy = coords.get(1);
 					break;
@@ -341,7 +351,7 @@ public class SVGPath extends SVGElement {
 					Vec2 c1 = new Vec2(cx, cy);
 					Vec2 c2 = new Vec2(x, y);
 					Vec2 c3 = new Vec2(x, y);
-					this.cubicCurves.add(new Vec2[] { c0, c1, c2, c3 });
+					c_curve.add(new Vec2[] { c0, c1, c2, c3 });
 					cx = x;
 					cy = y;
 					break;
@@ -359,7 +369,7 @@ public class SVGPath extends SVGElement {
 					Vec2 c1 = new Vec2(x0 + (2.0f / 3.0f) * (x1 - x0), y0 + (2.0f / 3.0f) * (y1 - y0));
 					Vec2 c2 = new Vec2(x2 + (2.0f / 3.0f) * (x1 - x2), y2 + (2.0f / 3.0f) * (y1 - y2));
 					Vec2 c3 = new Vec2(x2, y2);
-					this.cubicCurves.add(new Vec2[] { c0, c1, c2, c3 });
+					c_curve.add(new Vec2[] { c0, c1, c2, c3 });
 					cx = x2;
 					cy = y2;
 					break;
@@ -379,7 +389,7 @@ public class SVGPath extends SVGElement {
 					Vec2 c1 = new Vec2(x1, y1);
 					Vec2 c2 = new Vec2(x2, y2);
 					Vec2 c3 = new Vec2(x3, y3);
-					this.cubicCurves.add(new Vec2[] { c0, c1, c2, c3 });
+					c_curve.add(new Vec2[] { c0, c1, c2, c3 });
 					cx = x3;
 					cy = y3;
 					break;
@@ -392,10 +402,13 @@ public class SVGPath extends SVGElement {
 				}
 				}
 			}
+			if (c_curve.size() != 0) {
+				this.cubicCurves.add(c_curve);
+			}
 		}
 	}
 
-	public List<Vec2[]> getCubicCurves() {
+	public List<List<Vec2[]>> getCubicCurves() {
 		return this.cubicCurves;
 	}
 
