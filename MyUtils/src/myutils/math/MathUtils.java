@@ -441,11 +441,15 @@ public class MathUtils {
 		}
 		return true;
 	}
+	
+	public static boolean isSimplePolygon(ArrayList<Vec2> points) {
+		return isSimplePolygon(points, 0.01f);
+	}
 
 	/**
 	 * Returns true if the given points form into a simple polygon
-	 * 
 	 * A simple polygon is a polygon that does not intersect itself and does not have any holes. 
+	 * Currently to check, i'm just checking every pair of non-adjacent lines to see if they intersect. 
 	 * 
 	 * TODO implement O(nlogn) with sweep line
 	 * 	- Sort the endpoints according to their x component
@@ -457,9 +461,7 @@ public class MathUtils {
 	 * @param points
 	 * @return
 	 */
-	public static boolean isSimplePolygon(ArrayList<Vec2> points) {
-		float epsilon = 0.01f;
-
+	public static boolean isSimplePolygon(ArrayList<Vec2> points, float epsilon) {
 		for (int i = 0; i < points.size() - 1; i++) {
 			Vec2 u = new Vec2(points.get(i));
 			Vec2 v = new Vec2(points.get(i + 1));
@@ -728,7 +730,7 @@ public class MathUtils {
 		int n = points.size();
 		ArrayList<int[]> ans = new ArrayList<>();
 		boolean[] v = new boolean[n];
-		while (ans.size() != n - 2) {
+		while (ans.size() < n - 2) {
 			int[] next = new int[3];
 
 			//look for next triangle to remove

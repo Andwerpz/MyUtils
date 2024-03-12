@@ -18,6 +18,9 @@ public class Triangulator {
 
 	//currently, the strategy is to merge all the holes into the polygons that contain them, and triangulate
 	//the polygons 
+	
+	//TODO
+	// - test this lol
 
 	//should be a list of mutually non-intersecting polygons. 
 	private ArrayList<ArrayList<Vec2>> polygons;
