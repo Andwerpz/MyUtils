@@ -94,4 +94,13 @@ public class IVec2 {
 		return "[" + this.x + ", " + this.y + "]";
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof IVec2)) {
+			return false;
+		}
+		IVec2 vec = (IVec2) other;
+		return this.x == vec.x && this.y == vec.y;
+	}
+
 }
