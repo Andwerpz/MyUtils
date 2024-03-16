@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import myutils.math.MathUtils;
 import myutils.math.Vec2;
 import myutils.misc.Pair;
 
@@ -348,9 +349,9 @@ public class SVGPath extends SVGElement {
 					float x = coords.get(0);
 					float y = coords.get(1);
 					Vec2 c0 = new Vec2(cx, cy);
-					Vec2 c1 = new Vec2(cx, cy);
-					Vec2 c2 = new Vec2(x, y);
 					Vec2 c3 = new Vec2(x, y);
+					Vec2 c1 = MathUtils.lerp(c0, 0, c3, 1, 0.33f);
+					Vec2 c2 = MathUtils.lerp(c0, 0, c3, 1, 0.66f);
 					c_curve.add(new Vec2[] { c0, c1, c2, c3 });
 					cx = x;
 					cy = y;

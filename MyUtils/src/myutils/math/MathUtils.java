@@ -111,11 +111,27 @@ public class MathUtils {
 	 * @return
 	 */
 	public static Vec3 min(Vec3 a, Vec3 b) {
-		Vec3 ret = new Vec3();
-		ret.x = Math.min(a.x, b.x);
-		ret.y = Math.min(a.y, b.y);
-		ret.z = Math.min(a.z, b.z);
-		return ret;
+		return new Vec3(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
+	}
+
+	/**
+	 * Returns a component wise minimum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static Vec2 min(Vec2 a, Vec2 b) {
+		return new Vec2(Math.min(a.x, b.x), Math.min(a.y, b.y));
+	}
+
+	/**
+	 * Returns a component wise minimum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static IVec2 min(IVec2 a, IVec2 b) {
+		return new IVec2(Math.min(a.x, b.x), Math.min(a.y, b.y));
 	}
 
 	/**
@@ -125,15 +141,31 @@ public class MathUtils {
 	 * @return
 	 */
 	public static Vec3 max(Vec3 a, Vec3 b) {
-		Vec3 ret = new Vec3();
-		ret.x = Math.max(a.x, b.x);
-		ret.y = Math.max(a.y, b.y);
-		ret.z = Math.max(a.z, b.z);
-		return ret;
+		return new Vec3(Math.max(a.x, b.x), Math.max(a.y, b.y), Math.max(a.z, b.z));
 	}
 
 	/**
-	 * Returns a component wise minimum vector
+	 * Returns a component wise maximum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static Vec2 max(Vec2 a, Vec2 b) {
+		return new Vec2(Math.max(a.x, b.x), Math.max(a.y, b.y));
+	}
+
+	/**
+	 * Returns a component wise maximum vector
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static IVec2 max(IVec2 a, IVec2 b) {
+		return new IVec2(Math.max(a.x, b.x), Math.max(a.y, b.y));
+	}
+
+	/**
+	 * Returns a component wise minimum vector out of all the vectors in the array
 	 * @param a
 	 * @param b
 	 * @return
@@ -147,7 +179,7 @@ public class MathUtils {
 	}
 
 	/**
-	 * Returns a component wise maximum vector
+	 * Returns a component wise maximum vector out of all the vectors in the array
 	 * @param a
 	 * @param b
 	 * @return
@@ -441,7 +473,7 @@ public class MathUtils {
 		}
 		return true;
 	}
-	
+
 	public static boolean isSimplePolygon(ArrayList<Vec2> points) {
 		return isSimplePolygon(points, 0.01f);
 	}

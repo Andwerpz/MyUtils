@@ -24,6 +24,14 @@ public class Vec2 {
 		set((float) x, (float) y);
 	}
 
+	public Vec2(double a) {
+		set(a, a);
+	}
+
+	public Vec2(IVec2 a) {
+		set(a.x, a.y);
+	}
+
 	public Vec2(Vec2 v) {
 		set(v);
 	}
