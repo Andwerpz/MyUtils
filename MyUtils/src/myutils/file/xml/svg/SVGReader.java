@@ -18,7 +18,7 @@ public class SVGReader {
 		return ans;
 	}
 
-	private static void parseXMLAsSVG(XMLNode root, ArrayList<SVGElement> ans) {
+	public static void parseXMLAsSVG(XMLNode root, ArrayList<SVGElement> ans) {
 		//for now, just look for all path elements. 
 		//TODO add support for more svg elements. 
 

@@ -1,6 +1,9 @@
 package myutils.file.xml;
 
+import java.io.File;
 import java.util.Stack;
+
+import myutils.file.FileUtils;
 
 public class XMLReader {
 
@@ -37,6 +40,10 @@ public class XMLReader {
 		return node;
 	}
 
+	public static XMLNode parseFileAsXML(File f) {
+		return parseStringAsXML(FileUtils.readFileToString(f));
+	}
+
 	//the reserved characters are going to be '<' and '>'. We need these to determine when a tag starts and ends. 
 	//if the reserved characters are used anywhere in the text, this will break. 
 
@@ -58,6 +65,7 @@ public class XMLReader {
 					break;
 				}
 				String text = s.substring(i, r);
+				text = text.strip(); //note that we strip the content text. 
 				if (!text.isBlank()) {
 					nodeStack.peek().addContent(text);
 				}
@@ -82,6 +90,7 @@ public class XMLReader {
 				cr--;
 				XMLNode node = parseElementHeader(s.substring(cl, cr));
 				node.setIsProlog(true);
+				nodeStack.peek().addChild(node);
 			}
 			else if (s.charAt(cl) == '/') {
 				//end tag
@@ -91,6 +100,7 @@ public class XMLReader {
 				//self ending tag
 				cr--;
 				XMLNode node = parseElementHeader(s.substring(cl, cr));
+				node.setIsSelfEnding(true);
 				nodeStack.peek().addChild(node);
 			}
 			else if (s.charAt(cl) == '!') {
@@ -101,6 +111,8 @@ public class XMLReader {
 					//this is probably a DOCTYPE tag. idk what to do with these for now
 					cl++;
 					XMLNode node = parseElementHeader(s.substring(cl, cr));
+					node.setIsDoctype(true);
+					nodeStack.peek().addChild(node);
 				}
 			}
 			else {
@@ -112,7 +124,7 @@ public class XMLReader {
 			i = tr - 1;
 		}
 
-		return root.getChildren().get(0);
+		return root;
 	}
 
 }

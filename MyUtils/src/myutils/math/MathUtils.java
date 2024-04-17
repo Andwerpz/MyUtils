@@ -170,6 +170,34 @@ public class MathUtils {
 	 * @param b
 	 * @return
 	 */
+	public static IVec2 min(IVec2[] arr) {
+		IVec2 ret = arr[0];
+		for (int i = 1; i < arr.length; i++) {
+			ret = min(ret, arr[i]);
+		}
+		return ret;
+	}
+
+	/**
+	 * Returns a component wise maximum vector out of all the vectors in the array
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static IVec2 max(IVec2[] arr) {
+		IVec2 ret = arr[0];
+		for (int i = 1; i < arr.length; i++) {
+			ret = max(ret, arr[i]);
+		}
+		return ret;
+	}
+
+	/**
+	 * Returns a component wise minimum vector out of all the vectors in the array
+	 * @param a
+	 * @param b
+	 * @return
+	 */
 	public static Vec3 min(Vec3[] arr) {
 		Vec3 ret = arr[0];
 		for (int i = 1; i < arr.length; i++) {

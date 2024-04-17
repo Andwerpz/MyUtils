@@ -143,29 +143,6 @@ public class Vec2 {
 	}
 
 	/**
-	 * Adds s to this vector and returns this.
-	 */
-	public Vec2 addi(float s) {
-		return add(s, this);
-	}
-
-	/**
-	 * Sets out to the sum of this vector and s and returns out.
-	 */
-	public Vec2 add(float s, Vec2 out) {
-		out.x = x + s;
-		out.y = y + s;
-		return out;
-	}
-
-	/**
-	 * Returns a new vector that is the sum between this vector and s.
-	 */
-	public Vec2 add(float s) {
-		return add(s, new Vec2());
-	}
-
-	/**
 	 * Multiplies this vector by v and returns this.
 	 */
 	public Vec2 muli(Vec2 v) {
@@ -234,6 +211,22 @@ public class Vec2 {
 		return add(v, new Vec2());
 	}
 
+	public Vec2 add(float x, float y) {
+		return add(new Vec2(x, y), new Vec2());
+	}
+
+	public Vec2 addi(float x, float y) {
+		return add(new Vec2(x, y), this);
+	}
+
+	public Vec2 add(float s) {
+		return add(new Vec2(s), new Vec2());
+	}
+
+	public Vec2 addi(float s) {
+		return add(new Vec2(s), this);
+	}
+
 	/**
 	 * Adds v * s to this vector and returns this.
 	 */
@@ -278,6 +271,27 @@ public class Vec2 {
 	 */
 	public Vec2 sub(Vec2 v) {
 		return sub(v, new Vec2());
+	}
+
+	public Vec2 sub(float x, float y) {
+		return sub(new Vec2(x, y), new Vec2());
+	}
+
+	public Vec2 subi(float x, float y) {
+		return sub(new Vec2(x, y), this);
+	}
+
+	/**
+	 * Returns a new vector that is equal to (this.x - s, this.y - s);
+	 * @param f
+	 * @return
+	 */
+	public Vec2 sub(float s) {
+		return sub(new Vec2(s), new Vec2());
+	}
+
+	public Vec2 subi(float s) {
+		return sub(new Vec2(s), this);
 	}
 
 	/**

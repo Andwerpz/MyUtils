@@ -1,5 +1,7 @@
 package myutils.math;
 
+import java.util.Objects;
+
 public class IVec2 {
 
 	public int x, y;
@@ -43,6 +45,17 @@ public class IVec2 {
 	public IVec2 add(IVec2 other) {
 		IVec2 ret = new IVec2(this);
 		return ret.addi(other);
+	}
+
+	public IVec2 addi(int x, int y) {
+		this.x += x;
+		this.y += y;
+		return this;
+	}
+
+	public IVec2 add(int x, int y) {
+		IVec2 ret = new IVec2(this);
+		return ret.addi(x, y);
 	}
 
 	public IVec2 subi(IVec2 other) {
@@ -101,6 +114,11 @@ public class IVec2 {
 		}
 		IVec2 vec = (IVec2) other;
 		return this.x == vec.x && this.y == vec.y;
+	}
+
+	@Override
+	public final int hashCode() {
+		return Objects.hash(this.x, this.y);
 	}
 
 }
