@@ -85,6 +85,17 @@ public class MathUtils {
 	}
 
 	/**
+	 * Does component wise clamping on vector
+	 * @param low
+	 * @param high
+	 * @param val
+	 * @return
+	 */
+	public static Vec3 clamp(float low, float high, Vec3 val) {
+		return new Vec3(clamp(low, high, val.x), clamp(low, high, val.y), clamp(low, high, val.z));
+	}
+
+	/**
 	 * Rounds floating point down to the closest int 
 	 * 
 	 * @param val

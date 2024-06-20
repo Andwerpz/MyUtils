@@ -1,4 +1,4 @@
-package myutils.file.xml.svg;
+package myutils.file.svg;
 
 import java.util.ArrayList;
 

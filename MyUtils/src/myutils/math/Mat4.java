@@ -9,10 +9,7 @@ public class Mat4 {
 	}
 
 	public Mat4(float[][] mat) {
-		if (mat.length != 4 || mat[0].length != 4) {
-			throw new IllegalArgumentException("input matrix must be 4x4");
-		}
-
+		assert mat.length == 4 && mat[0].length == 4 : "input matrix must be 4x4";
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				this.mat[i][j] = mat[i][j];
