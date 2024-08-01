@@ -1,4 +1,6 @@
-package myutils.noise;
+package myutils.noise.base;
+
+import myutils.noise.NoiseGenerator;
 
 public abstract class SeededNoiseGenerator extends NoiseGenerator {
 	//this generates noise, but also guarantees that the noise produced at a coordinate will be the same, if the seed is the same. 

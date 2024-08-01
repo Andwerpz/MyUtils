@@ -1,4 +1,4 @@
-package myutils.noise;
+package myutils.noise.base;
 
 import java.util.ArrayList;
 import java.util.Collections;

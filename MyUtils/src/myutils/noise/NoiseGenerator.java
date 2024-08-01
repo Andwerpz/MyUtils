@@ -3,9 +3,6 @@ package myutils.noise;
 public abstract class NoiseGenerator {
 	//should support up to 3D noise
 
-	//TODO 
-	// - add domain warping 
-
 	protected abstract float _sampleNoise(float x, float y, float z);
 
 	public float sampleNoise(float x, float y, float z) {
