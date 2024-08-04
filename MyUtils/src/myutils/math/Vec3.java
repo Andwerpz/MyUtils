@@ -17,6 +17,12 @@ public class Vec3 {
 		this.z = val;
 	}
 
+	public Vec3(double val) {
+		this.x = (float) val;
+		this.y = (float) val;
+		this.z = (float) val;
+	}
+
 	public Vec3(float x, float y, float z) {
 		this.x = x;
 		this.y = y;

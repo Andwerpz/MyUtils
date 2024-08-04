@@ -65,8 +65,8 @@ public class PerlinNoise extends SeededNoiseGenerator {
 	}
 
 	@Override
-	protected float _sampleNoise(float x, float y, float z) {
-		return this.noise(x, y, x, this.frequency, this.amplitude, this.persistence, this.lacunarity, this.octaves);
+	protected float _sampleNoise(Vec3 v) {
+		return this.noise(v.x, v.y, v.z, this.frequency, this.amplitude, this.persistence, this.lacunarity, this.octaves);
 	}
 
 	private float noise(float x, float y, float z, float frequency, float amplitude, float persistence, float lacunarity, int octaves) {
