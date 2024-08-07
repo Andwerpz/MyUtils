@@ -16,6 +16,7 @@ public class NoiseDomainWarp extends NoiseBinaryOperator {
 	@Override
 	protected float _sampleNoise(Vec3 v) {
 		if (this.a == null) {
+			System.out.println("A IS NULL");
 			return 0;
 		}
 		if (this.b != null) {
@@ -24,6 +25,30 @@ public class NoiseDomainWarp extends NoiseBinaryOperator {
 			v.z += b.sampleNoise(v.add(this.zOffset));
 		}
 		return a.sampleNoise(v);
+	}
+	
+	public Vec3 getXOffset() {
+		return xOffset;
+	}
+
+	public void setXOffset(Vec3 xOffset) {
+		this.xOffset = xOffset;
+	}
+
+	public Vec3 getYOffset() {
+		return yOffset;
+	}
+
+	public void setYOffset(Vec3 yOffset) {
+		this.yOffset = yOffset;
+	}
+
+	public Vec3 getZOffset() {
+		return zOffset;
+	}
+
+	public void setZOffset(Vec3 zOffset) {
+		this.zOffset = zOffset;
 	}
 
 }
