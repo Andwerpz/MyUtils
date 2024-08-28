@@ -1441,6 +1441,7 @@ public class MathUtils {
 			if (new Vec3(triangle_intersect, sphere_origin).length() < sphere_radius) {
 				return triangle_intersect;
 			}
+			//this shouldn't happen i think
 			return null;
 		}
 
