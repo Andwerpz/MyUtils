@@ -37,6 +37,20 @@ public class MathUtils {
 	}
 
 	/**
+	 * Generates a random (uniform) point on the unit sphere
+	 * @return
+	 */
+	public static Vec3 randomUnitDir() {
+		while (true) {
+			Vec3 dir = random(new Vec3(-1), new Vec3(1));
+			if (dir.lengthSq() < 1) {
+				dir.normalize();
+				return dir;
+			}
+		}
+	}
+
+	/**
 	 * Takes in a value, and returns it clamped to two other inputs
 	 * 
 	 * @param low
@@ -591,6 +605,18 @@ public class MathUtils {
 			}
 		}
 		return cnt % 2 == 1;
+	}
+
+	/**
+	 * Takes a point and a bounding box, and returns whether or not the point is inside the bounding box
+	 * @param point
+	 * @param bb_min
+	 * @param bb_max
+	 * @return
+	 */
+	public static boolean pointInsideBoundingBox(Vec3 pt, Vec3 bb_min, Vec3 bb_max) {
+		float epsilon = 0.0001f;
+		return pt.x + epsilon > bb_min.x && pt.y + epsilon > bb_min.y && pt.z + epsilon > bb_min.z && pt.x - epsilon < bb_max.x && pt.y - epsilon < bb_max.y && pt.z - epsilon < bb_max.z;
 	}
 
 	/**
@@ -1367,6 +1393,78 @@ public class MathUtils {
 		}
 
 		return plane_intersect;
+	}
+
+	/**
+	 * Take in a ray and a sphere, and returns the first point where the ray intersects with the sphere. 
+	 * Assumes that the sphere is not filled, so will only consider when the ray enters and exits the sphere
+	 * 
+	 * Can reduce ray sphere to a quadratic equation
+	 * 
+	 * @param ray_origin
+	 * @param ray_dir
+	 * @param sphere_center
+	 * @param sphere_radius
+	 * @return
+	 */
+	public static Vec3 ray_sphereIntersect(Vec3 ray_origin, Vec3 ray_dir, Vec3 sphere_center, float sphere_radius) {
+		Vec3 offset_ray_origin = ray_origin.sub(sphere_center);
+
+		float a = ray_dir.dot(ray_dir);
+		float b = 2.0f * ray_dir.dot(offset_ray_origin);
+		float c = offset_ray_origin.dot(offset_ray_origin) - sphere_radius * sphere_radius;
+
+		float d = b * b - 4.0f * a * c;
+
+		if (d >= 0) {
+			float dist = (float) ((-b - Math.sqrt(d)) / (2.0 * a));
+			if (dist > 0.0001) {
+				//entry collision
+				return ray_origin.add(ray_dir.mul(dist));
+			}
+			else {
+				dist = (float) ((-b + Math.sqrt(d)) / (2.0 * a));
+				if (dist > 0.0001) {
+					//exit collision
+					return ray_origin.add(ray_dir.mul(dist));
+				}
+			}
+		}
+		return null; //no collision
+	}
+
+	/**
+	 * A bounding box is an axis aligned parallelipiped. It can be defined by a minimum and maximum point.
+	 * Returns the closest point to the ray origin where the ray intersects with the boundary of the bounding box
+	 * 
+	 * @param ray_origin
+	 * @param ray_dir
+	 * @param bb_min
+	 * @param bb_max
+	 * @return
+	 */
+	public static Vec3 ray_boundingBoxIntersect(Vec3 ray_origin, Vec3 ray_dir, Vec3 bb_min, Vec3 bb_max) {
+		float[] dir_component = new float[] { ray_dir.x, ray_dir.y, ray_dir.z };
+		float[] pos_component = new float[] { ray_origin.x, ray_origin.y, ray_origin.z };
+		float[] min_component = new float[] { bb_min.x, bb_min.y, bb_min.z };
+		float[] max_component = new float[] { bb_max.x, bb_max.y, bb_max.z };
+		boolean did_hit = false;
+		boolean inside_box = pointInsideBoundingBox(ray_origin, bb_min, bb_max);
+		float hit_dist = (float) 1e9; //some large number
+		for (int i = 0; i < 3; i++) {
+			if (dir_component[i] == 0) {
+				continue;
+			}
+			float tgt = dir_component[i] < 0 ^ inside_box ? max_component[i] : min_component[i];
+			float dist = tgt - pos_component[i];
+			float ray_mul = dist / dir_component[i];
+			Vec3 test_pos = ray_origin.add(ray_dir.mul(ray_mul));
+			if (pointInsideBoundingBox(test_pos, bb_min, bb_max) && ray_mul >= 0) {
+				did_hit = true;
+				hit_dist = Math.min(hit_dist, ray_mul);
+			}
+		}
+		return did_hit ? ray_origin.add(ray_dir.mul(hit_dist)) : null;
 	}
 
 	/**

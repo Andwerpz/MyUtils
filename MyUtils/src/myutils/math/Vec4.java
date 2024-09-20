@@ -74,6 +74,10 @@ public class Vec4 {
 		return this;
 	}
 
+	public Vec3 xyz() {
+		return new Vec3(this.x, this.y, this.z);
+	}
+
 	@Override
 	public String toString() {
 		return "[" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + "]";
