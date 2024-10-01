@@ -25,6 +25,16 @@ public class MathUtils {
 	public static float random(float low, float high) {
 		return (float) (Math.random() * (high - low) + low);
 	}
+	
+	/**
+	 * Generates a random vector in the bounding box defined by the two inputs
+	 * @param low
+	 * @param high
+	 * @return
+	 */
+	public static Vec2 random(Vec2 low, Vec2 high) {
+		return new Vec2(random(low.x, high.x), random(low.y, high.y));
+	}
 
 	/**
 	 * Generates a random vector in the bounding box defined by the two inputs
