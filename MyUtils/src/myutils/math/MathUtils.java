@@ -616,6 +616,18 @@ public class MathUtils {
 		}
 		return cnt % 2 == 1;
 	}
+	
+	/**
+	 * Takes a point and a bounding box and returns whether or not the point is inside the bounding box
+	 * @param pt
+	 * @param bb_min
+	 * @param bb_max
+	 * @return
+	 */
+	public static boolean pointInsideBoundingBox(Vec2 pt, Vec2 bb_min, Vec2 bb_max) {
+		float epsilon = 0.0001f;
+		return pt.x + epsilon > bb_min.x && pt.y + epsilon > bb_min.y && pt.x - epsilon < bb_max.x && pt.y - epsilon < bb_max.y;
+	}
 
 	/**
 	 * Takes a point and a bounding box, and returns whether or not the point is inside the bounding box
