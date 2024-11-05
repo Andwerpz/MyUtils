@@ -245,4 +245,9 @@ public class Vec3 {
 		Vec3 v = (Vec3) o;
 		return v.x == this.x && v.y == this.y && v.z == this.z;
 	}
+
+	@Override
+	public int hashCode() {
+		return Float.hashCode(x) ^ Float.hashCode(y) ^ Float.hashCode(z);
+	}
 }

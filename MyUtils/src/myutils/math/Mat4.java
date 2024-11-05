@@ -47,6 +47,19 @@ public class Mat4 {
 		}
 	}
 
+	public float determinant() {
+		float det = 0;
+		det += mat[0][0] * determinant3x3(mat[1][1], mat[1][2], mat[1][3], mat[2][1], mat[2][2], mat[2][3], mat[3][1], mat[3][2], mat[3][3]);
+		det -= mat[0][1] * determinant3x3(mat[1][0], mat[1][2], mat[1][3], mat[2][0], mat[2][2], mat[2][3], mat[3][0], mat[3][2], mat[3][3]);
+		det += mat[0][2] * determinant3x3(mat[1][0], mat[1][1], mat[1][3], mat[2][0], mat[2][1], mat[2][3], mat[3][0], mat[3][1], mat[3][3]);
+		det -= mat[0][3] * determinant3x3(mat[1][0], mat[1][1], mat[1][2], mat[2][0], mat[2][1], mat[2][2], mat[3][0], mat[3][1], mat[3][2]);
+		return det;
+	}
+
+	private float determinant3x3(float a11, float a12, float a13, float a21, float a22, float a23, float a31, float a32, float a33) {
+		return a11 * (a22 * a33 - a23 * a32) - a12 * (a21 * a33 - a23 * a31) + a13 * (a21 * a32 - a22 * a31);
+	}
+
 	public Mat4 transpose() {
 		float[][] nextMat = new float[4][4];
 		for (int i = 0; i < 4; i++) {
@@ -320,6 +333,10 @@ public class Mat4 {
 		result.mat[2][2] = zAmt;
 
 		return result;
+	}
+
+	public static Mat4 scale(Vec3 v) {
+		return Mat4.scale(v.x, v.y, v.z);
 	}
 
 	/**

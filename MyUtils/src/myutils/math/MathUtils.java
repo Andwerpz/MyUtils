@@ -17,6 +17,15 @@ public class MathUtils {
 	// -- GENERAL --
 
 	/**
+	 * Returns true if f is non-negative. 
+	 * @param f
+	 * @return
+	 */
+	public static boolean sign(float f) {
+		return f >= 0;
+	}
+
+	/**
 	 * Generates random float between low and high
 	 * @param low
 	 * @param high
@@ -25,7 +34,7 @@ public class MathUtils {
 	public static float random(float low, float high) {
 		return (float) (Math.random() * (high - low) + low);
 	}
-	
+
 	/**
 	 * Generates a random vector in the bounding box defined by the two inputs
 	 * @param low
@@ -47,10 +56,24 @@ public class MathUtils {
 	}
 
 	/**
+	 * Generates a random (uniform) point on the unit circle
+	 * @return
+	 */
+	public static Vec2 randomUnitDir2D() {
+		while (true) {
+			Vec2 dir = random(new Vec2(-1), new Vec2(1));
+			if (dir.lengthSq() < 1) {
+				dir.normalize();
+				return dir;
+			}
+		}
+	}
+
+	/**
 	 * Generates a random (uniform) point on the unit sphere
 	 * @return
 	 */
-	public static Vec3 randomUnitDir() {
+	public static Vec3 randomUnitDir3D() {
 		while (true) {
 			Vec3 dir = random(new Vec3(-1), new Vec3(1));
 			if (dir.lengthSq() < 1) {
@@ -58,6 +81,50 @@ public class MathUtils {
 				return dir;
 			}
 		}
+	}
+
+	/**
+	 * Returns the dot product between two vectors
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static float dot(Vec3 a, Vec3 b) {
+		return a.x * b.x + a.y * b.y + a.z * b.z;
+	}
+
+	/**
+	 * Returns the cross product between two vectors. 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static Vec3 cross(Vec3 a, Vec3 b) {
+		Vec3 result = new Vec3(0);
+		result.x = a.y * b.z - a.z * b.y;
+		result.y = a.z * b.x - a.x * b.z;
+		result.z = a.x * b.y - a.y * b.x;
+		return result;
+	}
+
+	/**
+	 * Takes in two points and returns the squared distance. 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static float distSq(Vec3 a, Vec3 b) {
+		return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z);
+	}
+
+	/**
+	 * Takes in two points and returns the distance between them. 
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static float dist(Vec3 a, Vec3 b) {
+		return (float) Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z));
 	}
 
 	/**
@@ -137,6 +204,24 @@ public class MathUtils {
 	 */
 	public static int ceil(float val) {
 		return (int) Math.ceil(val);
+	}
+
+	/**
+	 * Generates an IVec3 based on the componentwise floor of the input Vec3
+	 * @param v
+	 * @return
+	 */
+	public static IVec3 floor(Vec3 v) {
+		return new IVec3((int) Math.floor(v.x), (int) Math.floor(v.y), (int) Math.floor(v.z));
+	}
+
+	/**
+	 * Generates an IVec3 based on the componentwise ceil of the input Vec3
+	 * @param v
+	 * @return
+	 */
+	public static IVec3 ceil(Vec3 v) {
+		return new IVec3((int) Math.ceil(v.x), (int) Math.ceil(v.y), (int) Math.ceil(v.z));
 	}
 
 	/**
@@ -352,6 +437,18 @@ public class MathUtils {
 	}
 
 	/**
+	 * Takes in a rotation quaternion and a vec3, and returns the vec3 rotated by the transform described by the quaternion. 
+	 * @param q
+	 * @param v
+	 * @return
+	 */
+	public static Vec3 quaternionRotateVec3(Quaternion q, Vec3 v) {
+		Quaternion qv = new Quaternion(0, v.x, v.y, v.z);
+		qv = q.mul(qv).mul(q.inv());
+		return new Vec3(qv.i, qv.j, qv.k);
+	}
+
+	/**
 	 * Returns the quaternion described by the rotation matrix
 	 * 
 	 * Source : https://d3cw3dd2w32x2b.cloudfront.net/wp-content/uploads/2015/01/matrix-to-quat.pdf
@@ -395,9 +492,10 @@ public class MathUtils {
 	 * @param a
 	 * @return
 	 */
-	public static Mat4 quaternionToRotationMat4(Quaternion a) {
+	public static Mat4 quaternionToRotationMat4(Quaternion _a) {
 		float[][] mat = new float[4][4];
 
+		Quaternion a = new Quaternion(_a);
 		a.normalize();
 
 		mat[0][0] = 1 - 2 * a.j * a.j - 2 * a.k * a.k;
@@ -421,6 +519,34 @@ public class MathUtils {
 		mat[3][3] = 1;
 
 		return new Mat4(mat);
+	}
+
+	/**
+	 * Returns the rotation matrix described by the quaternion. The quaternion must be a unit quaternion, so it is normalized first. 
+	 * 
+	 * The matrix describes the transformation qpq*, so the rotation stored in the quaternion must have theta / 2. 
+	 * @param a
+	 * @return
+	 */
+	public static Mat3 quaternionToRotationMat3(Quaternion _a) {
+		float[][] mat = new float[3][3];
+
+		Quaternion a = new Quaternion(_a);
+		a.normalize();
+
+		mat[0][0] = 1 - 2 * a.j * a.j - 2 * a.k * a.k;
+		mat[0][1] = 2 * a.i * a.j - 2 * a.s * a.k;
+		mat[0][2] = 2 * a.i * a.k + 2 * a.s * a.j;
+
+		mat[1][0] = 2 * a.i * a.j + 2 * a.s * a.k;
+		mat[1][1] = 1 - 2 * a.i * a.i - 2 * a.k * a.k;
+		mat[1][2] = 2 * a.j * a.k - 2 * a.s * a.i;
+
+		mat[2][0] = 2 * a.i * a.k - 2 * a.s * a.j;
+		mat[2][1] = 2 * a.j * a.k + 2 * a.s * a.i;
+		mat[2][2] = 1 - 2 * a.i * a.i - 2 * a.j * a.j;
+
+		return new Mat3(mat);
 	}
 
 	/**
@@ -616,7 +742,7 @@ public class MathUtils {
 		}
 		return cnt % 2 == 1;
 	}
-	
+
 	/**
 	 * Takes a point and a bounding box and returns whether or not the point is inside the bounding box
 	 * @param pt
@@ -928,6 +1054,122 @@ public class MathUtils {
 	}
 
 	/**
+	 * Returns the unsigned 2D area of the triangle defined by these three points
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @return
+	 */
+	public static float triangleArea(Vec3 a, Vec3 b, Vec3 c) {
+		return (cross(new Vec3(a, b), new Vec3(b, c))).length() / 2.0f;
+	}
+
+	/**
+	 * Returns the signed volume of the given tetrahedron. 
+	 * The volume is positive if cross(ab, ac) is pointing in the same direction as ad. 
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @param d
+	 * @return
+	 */
+	public static float signedTetrahedronVolume(Vec3 a, Vec3 b, Vec3 c, Vec3 d) {
+		return dot(new Vec3(a, d), cross(new Vec3(a, b), new Vec3(a, c))) / 6.0f;
+	}
+
+	/**
+	 * Tests if the given point is contained by the given tetrahedron. 
+	 * Does a check on the signed volume. 
+	 * @param pt
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @param d
+	 * @return
+	 */
+	public static boolean pointInsideTetrahedron(Vec3 pt, Vec3 a, Vec3 b, Vec3 c, Vec3 d) {
+		boolean o = sign(signedTetrahedronVolume(a, b, c, d));
+		boolean sa = sign(signedTetrahedronVolume(pt, b, c, d));
+		boolean sb = sign(signedTetrahedronVolume(a, pt, c, d));
+		boolean sc = sign(signedTetrahedronVolume(a, b, pt, d));
+		boolean sd = sign(signedTetrahedronVolume(a, b, c, pt));
+		return o == sa && o == sb && o == sc && o == sd;
+	}
+
+	/**
+	 * Computes the point that is equidistant to all 4 given points, or the circumcenter.
+	 * In the case where all 4 points are coplanar, will return null. Note that circumcenter is unstable when det A is small. 
+	 * http://rodolphe-vaillant.fr/entry/127/find-a-tetrahedron-circumcenter
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @param d
+	 * @return
+	 */
+	public static Vec3 calculateCircumcenter(Vec3 a, Vec3 b, Vec3 c, Vec3 d) {
+		Vec3 ab = new Vec3(a, b);
+		Vec3 ac = new Vec3(a, c);
+		Vec3 ad = new Vec3(a, d);
+		Mat3 A = new Mat3();
+		A.mat[0][0] = ab.x;
+		A.mat[0][1] = ab.y;
+		A.mat[0][2] = ab.z;
+		A.mat[1][0] = ac.x;
+		A.mat[1][1] = ac.y;
+		A.mat[1][2] = ac.z;
+		A.mat[2][0] = ad.x;
+		A.mat[2][1] = ad.y;
+		A.mat[2][2] = ad.z;
+		Mat3 Ainv = A.inverse();
+		if (Ainv == null) {
+			return null;
+		}
+
+		Vec3 B = new Vec3(b.lengthSq() - a.lengthSq(), c.lengthSq() - a.lengthSq(), d.lengthSq() - a.lengthSq());
+		B.muli(0.5f);
+
+		return Ainv.mul(B);
+	}
+
+	/**
+	 * Takes in a triangle defined by 3 points and a point, and computes the barycentric coordinates of the point. 
+	 * Assumes that the supplied point is on the triangle.
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @param pt
+	 * @return
+	 */
+	public static Vec3 barycentricCoords(Vec3 a, Vec3 b, Vec3 c, Vec3 pt) {
+		float inv_tri_area = 1.0f / triangleArea(a, b, c);
+		Vec3 result = new Vec3(0);
+		result.x = triangleArea(pt, b, c) * inv_tri_area;
+		result.y = triangleArea(pt, c, a) * inv_tri_area;
+		result.z = triangleArea(pt, a, b) * inv_tri_area;
+		return result;
+	}
+
+	/**
+	 * Takes in a tetrahedron defined by 4 points and a point, and computes the barycentric coordinates of the point.
+	 * The supplied tetrahedron's winding order is assumed to be counterclockwise, or dot(d - a, cross(b - a, c - a)) >= 0
+	 * @param a
+	 * @param b
+	 * @param c
+	 * @param d
+	 * @param pt
+	 * @return
+	 */
+	public static Vec4 barycentricCoords(Vec3 a, Vec3 b, Vec3 c, Vec3 d, Vec3 pt) {
+		float tot_area = MathUtils.signedTetrahedronVolume(a, b, c, d);
+		Vec4 res = new Vec4(0);
+		res.x = MathUtils.signedTetrahedronVolume(pt, b, c, d) / tot_area;
+		res.y = MathUtils.signedTetrahedronVolume(a, pt, c, d) / tot_area;
+		res.z = MathUtils.signedTetrahedronVolume(a, b, pt, d) / tot_area;
+		res.w = MathUtils.signedTetrahedronVolume(a, b, c, pt) / tot_area;
+		return res;
+	}
+
+	/**
 	 * Takes in two lines, and returns their intersection points. 
 	 * 
 	 * Doesn't really handle parallel lines very well. 
@@ -1132,6 +1374,17 @@ public class MathUtils {
 	}
 
 	/**
+	 * Takes in a point and a line segment, and returns the minimum distance from any point on the line segment to the first point. 
+	 * @param pt
+	 * @param b0
+	 * @param b1
+	 * @return
+	 */
+	public static float point_lineSegmentDistance(Vec3 pt, Vec3 b0, Vec3 b1) {
+		return MathUtils.dist(pt, MathUtils.point_lineSegmentProjectClamped(pt, b0, b1));
+	}
+
+	/**
 	 * Take in two lines in 3D, and returns the shortest distance between them.
 	 * @param a_point
 	 * @param a_dir
@@ -1182,13 +1435,45 @@ public class MathUtils {
 	}
 
 	/**
+	 * Takes in two line segments and returns the minimum distance between them. 
+	 * @param a0
+	 * @param a1
+	 * @param b0
+	 * @param b1
+	 * @return
+	 */
+	public static float lineSegment_lineSegmentDistance(Vec3 a0, Vec3 a1, Vec3 b0, Vec3 b1) {
+		float[] nm = line_lineDistanceNM(a0, a1, b0, b1);
+		nm[0] = clamp(0, 1, nm[0]);
+		nm[1] = clamp(0, 1, nm[1]);
+		Vec3 p0 = a0.add(new Vec3(a0, a1).mul(nm[0]));
+		Vec3 p1 = b0.add(new Vec3(b0, b1).mul(nm[1]));
+		return dist(p0, p1);
+	}
+
+	/**
+	 * Takes in two line segments and returns the corresponding pair of points on the two line segments that minimizes the distance
+	 * @param a0
+	 * @param a1
+	 * @param b0
+	 * @param b1
+	 * @return
+	 */
+	public static Pair<Vec3, Vec3> lineSegment_lineSegmentClosestPoints(Vec3 a0, Vec3 a1, Vec3 b0, Vec3 b1) {
+		float[] nm = line_lineDistanceNM(a0, a1, b0, b1);
+		nm[0] = clamp(0, 1, nm[0]);
+		nm[1] = clamp(0, 1, nm[1]);
+		Vec3 p0 = a0.add(new Vec3(a0, a1).mul(nm[0]));
+		Vec3 p1 = b0.add(new Vec3(b0, b1).mul(nm[1]));
+		return new Pair<>(p0, p1);
+	}
+
+	/**
 	 * Takes in two line segments in 3D, and returns the values for n and m.
 	 * Where v is the vector between the two closest points of a and b,
-	 * v.x = (a0.x + n * d0.x) - (b0.x + m * d1.x)
-	 * v.y = (a0.y + n * d0.y) - (b0.y + m * d1.y)
-	 * v.z = (a0.z + n * d0.z) - (b0.z + m * d1.z)
+	 * v = (a0 + n * d0) - (b0 + m * d1)
 	 * 
-	 * d0 is the direction vector of a, d0 is for b. 
+	 * d0 is the direction vector of a, d1 is for b. 
 	 * v.dot(d0) = 0
 	 * v.dot(d1) = 0
 	 * 
@@ -1360,6 +1645,39 @@ public class MathUtils {
 	}
 
 	/**
+	 * Take in a point and a triangle defined by 3 points, and returns the closest point on the triangle to the plane
+	 * @param pt
+	 * @param t0
+	 * @param t1
+	 * @param t2
+	 * @return
+	 */
+	public static Vec3 point_triangleProjectClamped(Vec3 pt, Vec3 t0, Vec3 t1, Vec3 t2) {
+		Vec3 tri_norm = MathUtils.cross(new Vec3(t0, t1), new Vec3(t0, t2));
+		tri_norm.normalize();
+
+		//check if directly projecting onto the plane will get us a point in the triangle. 
+		Vec3 plane_proj = point_planeProject(pt, t0, tri_norm);
+		if (MathUtils.pointInsideTriangularColumn(plane_proj, t0, t1, t2)) {
+			return plane_proj;
+		}
+
+		//otherwise, have to clamp to a line segment. 
+		Vec3 s0 = MathUtils.point_lineSegmentProjectClamped(pt, t0, t1);
+		Vec3 s1 = MathUtils.point_lineSegmentProjectClamped(pt, t1, t2);
+		Vec3 s2 = MathUtils.point_lineSegmentProjectClamped(pt, t2, t0);
+
+		Vec3 ans = s0;
+		if (MathUtils.dist(pt, s1) < MathUtils.dist(pt, ans)) {
+			ans = s1;
+		}
+		if (MathUtils.dist(pt, s2) < MathUtils.dist(pt, ans)) {
+			ans = s2;
+		}
+		return ans;
+	}
+
+	/**
 	 * Take in a point and a triangle, and returns true if the point is contained within the triangle. 
 	 * 
 	 * @param point
@@ -1376,6 +1694,30 @@ public class MathUtils {
 		ans &= pointsOnSameSideOfLine(t1, new Vec2(t1, t2), centroid, point);
 		ans &= pointsOnSameSideOfLine(t2, new Vec2(t2, t0), centroid, point);
 		return ans;
+	}
+
+	/**
+	 * Takes a point and a triangle and returns whether or not the point, when projected down into the plane defined by the triangle,
+	 * is inside of the triangle. 
+	 * @param pt
+	 * @param t0
+	 * @param t1
+	 * @param t2
+	 * @return
+	 */
+	public static boolean pointInsideTriangularColumn(Vec3 pt, Vec3 t0, Vec3 t1, Vec3 t2) {
+		Vec3 d0 = new Vec3(t0, t1).normalize();
+		Vec3 d1 = new Vec3(t1, t2).normalize();
+		Vec3 d2 = new Vec3(t2, t0).normalize();
+
+		Vec3 plane_normal = d0.cross(d1).normalize();
+		Vec3 plane_intersect = MathUtils.point_planeProject(pt, t0, plane_normal);
+
+		Vec3 n0 = d0.cross(plane_normal);
+		Vec3 n1 = d1.cross(plane_normal);
+		Vec3 n2 = d2.cross(plane_normal);
+
+		return n0.dot(t0.sub(plane_intersect)) >= 0 && n1.dot(t1.sub(plane_intersect)) >= 0 && n2.dot(t2.sub(plane_intersect)) >= 0;
 	}
 
 	/**
@@ -1415,6 +1757,25 @@ public class MathUtils {
 		}
 
 		return plane_intersect;
+	}
+
+	/**
+	 * Takes a line segment defined by its endpoints, and a triangle defined by its 3 vertices, and returns the intersection point 
+	 * if it exists. 
+	 * @param a0
+	 * @param a1
+	 * @param t0
+	 * @param t1
+	 * @param t2
+	 * @return
+	 */
+	public static Vec3 lineSegment_triangleIntersect(Vec3 a0, Vec3 a1, Vec3 t0, Vec3 t1, Vec3 t2) {
+		Vec3 dir = new Vec3(a0, a1).normalize();
+		Vec3 ret = ray_triangleIntersect(a0, dir, t0, t1, t2);
+		if (ret == null || MathUtils.dist(a0, ret) > MathUtils.dist(a0, a1)) {
+			return null;
+		}
+		return ret;
 	}
 
 	/**
