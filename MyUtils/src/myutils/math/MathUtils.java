@@ -1486,7 +1486,7 @@ public class MathUtils {
 	 * ((a0.y + n * d0.y) - (b0.y + m * d1.y)) * d1.y + 
 	 * ((a0.z + n * d0.z) - (b0.z + m * d1.z)) * d1.z = 0
 	 * 
-	 * finally, solve for n and m. 
+	 * finally, solve for n and m.
 	 * 
 	 * closest point on line a : a0 + n * d0. 
 	 * for line b : b0 + m * d0. 
@@ -1500,6 +1500,15 @@ public class MathUtils {
 	private static float[] line_lineDistanceNM(Vec3 a0, Vec3 a1, Vec3 b0, Vec3 b1) {
 		Vec3 d0 = new Vec3(a0, a1);
 		Vec3 d1 = new Vec3(b0, b1);
+		
+		if(MathUtils.dot(d0, d1) == 0) {
+			//they are exactly perpendicular
+			float n = MathUtils.dot(b0, d0) - MathUtils.dot(a0, d0);
+			float m = -MathUtils.dot(b0, d1) + MathUtils.dot(a0, d1);
+			n /= d0.lengthSq();
+			m /= d1.lengthSq();
+			return new float[] {n, m};
+		}
 
 		float n = 0;
 		float m = 0;
