@@ -1500,14 +1500,14 @@ public class MathUtils {
 	private static float[] line_lineDistanceNM(Vec3 a0, Vec3 a1, Vec3 b0, Vec3 b1) {
 		Vec3 d0 = new Vec3(a0, a1);
 		Vec3 d1 = new Vec3(b0, b1);
-		
-		if(MathUtils.dot(d0, d1) == 0) {
+
+		if (MathUtils.dot(d0, d1) == 0) {
 			//they are exactly perpendicular
 			float n = MathUtils.dot(b0, d0) - MathUtils.dot(a0, d0);
 			float m = -MathUtils.dot(b0, d1) + MathUtils.dot(a0, d1);
 			n /= d0.lengthSq();
 			m /= d1.lengthSq();
-			return new float[] {n, m};
+			return new float[] { n, m };
 		}
 
 		float n = 0;
@@ -1544,6 +1544,66 @@ public class MathUtils {
 		n = (cnst1 - mExp1 * m) / nExp1;
 
 		return new float[] { n, m };
+	}
+
+	/**
+	 * Takes in 3 planes and returns the point at which they all intersect. 
+	 * Returns null if such an intersection point doesn't exist. 
+	 * 
+	 * https://gdbooks.gitbooks.io/3dcollisions/content/Chapter1/three_plane_intersection.html
+	 * @param p1_origin
+	 * @param p1_normal
+	 * @param p2_origin
+	 * @param p2_normal
+	 * @param p3_origin
+	 * @param p3_normal
+	 * @return
+	 */
+	public static Vec3 plane_plane_planeIntersect(Vec3 p1_origin, Vec3 p1_normal, Vec3 p2_origin, Vec3 p2_normal, Vec3 p3_origin, Vec3 p3_normal) {
+		Vec3 m1 = new Vec3(p1_normal.x, p2_normal.x, p3_normal.x);
+		Vec3 m2 = new Vec3(p1_normal.y, p2_normal.y, p3_normal.y);
+		Vec3 m3 = new Vec3(p1_normal.z, p2_normal.z, p3_normal.z);
+		float d1 = MathUtils.dot(p1_normal, p1_origin);
+		float d2 = MathUtils.dot(p2_normal, p2_origin);
+		float d3 = MathUtils.dot(p3_normal, p3_origin);
+		Vec3 d = new Vec3(d1, d2, d3);
+
+		Vec3 u = MathUtils.cross(m2, m3);
+		Vec3 v = MathUtils.cross(m1, d);
+		float denom = MathUtils.dot(m1, u);
+
+		if (Math.abs(denom) < 0.00001) {
+			return null;
+		}
+		return new Vec3(dot(d, u) / denom, dot(m3, v) / denom, -dot(m2, v) / denom);
+	}
+
+	/**
+	 * Takes in two planes and returns the line on which they are intersecting. 
+	 * Line is returned in the form {origin, direction}, and direction is normalized. 
+	 * If the two planes are parallel, returns null
+	 * 
+	 * https://mathworld.wolfram.com/Plane-PlaneIntersection.html
+	 * @param p1_origin
+	 * @param p1_normal
+	 * @param p2_origin
+	 * @param p2_normal
+	 * @return
+	 */
+	public static Pair<Vec3, Vec3> plane_planeIntersect(Vec3 p1_origin, Vec3 p1_normal, Vec3 p2_origin, Vec3 p2_normal) {
+		p1_normal.normalize();
+		p2_normal.normalize();
+		if (MathUtils.cross(p1_normal, p2_normal).length() == 0) {
+			return null;
+		}
+
+		float d1 = MathUtils.dot(p1_normal, p1_origin);
+		float d2 = MathUtils.dot(p2_normal, p2_origin);
+		Vec3 line_dir = MathUtils.cross(p1_normal, p2_normal);
+		line_dir.normalize();
+
+		//TODO finish this
+		return null;
 	}
 
 	/**

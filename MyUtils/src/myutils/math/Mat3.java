@@ -118,4 +118,16 @@ public class Mat3 {
 		return m;
 	}
 
+	@Override
+	public String toString() {
+		String out = "";
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				out += mat[i][j] + " ";
+			}
+			out += "\n";
+		}
+		return out;
+	}
+
 }
