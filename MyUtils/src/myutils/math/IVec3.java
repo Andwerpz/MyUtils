@@ -1,5 +1,7 @@
 package myutils.math;
 
+import java.util.Objects;
+
 public class IVec3 {
 
 	public int x, y, z;
@@ -114,8 +116,7 @@ public class IVec3 {
 
 	@Override
 	public int hashCode() {
-		long mod = (long) (1e9 + 7);
-		return (int) MathUtils.cantor(this.x, MathUtils.cantor(this.y, this.z, mod), mod);
+		return Objects.hash(this.x, this.y, this.z);
 	}
 
 	@Override
