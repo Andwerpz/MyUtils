@@ -750,7 +750,7 @@ public class MathUtils {
 	 * @param bb_max
 	 * @return
 	 */
-	public static boolean pointInsideBoundingBox(Vec2 pt, Vec2 bb_min, Vec2 bb_max) {
+	public static boolean pointInsideAABB(Vec2 pt, Vec2 bb_min, Vec2 bb_max) {
 		float epsilon = 0.0001f;
 		return pt.x + epsilon > bb_min.x && pt.y + epsilon > bb_min.y && pt.x - epsilon < bb_max.x && pt.y - epsilon < bb_max.y;
 	}
@@ -762,9 +762,20 @@ public class MathUtils {
 	 * @param bb_max
 	 * @return
 	 */
-	public static boolean pointInsideBoundingBox(Vec3 pt, Vec3 bb_min, Vec3 bb_max) {
+	public static boolean pointInsideAABB(Vec3 pt, Vec3 bb_min, Vec3 bb_max) {
 		float epsilon = 0.0001f;
 		return pt.x + epsilon > bb_min.x && pt.y + epsilon > bb_min.y && pt.z + epsilon > bb_min.z && pt.x - epsilon < bb_max.x && pt.y - epsilon < bb_max.y && pt.z - epsilon < bb_max.z;
+	}
+
+	/**
+	 * Returns true if the two AABBs are intersecting
+	 * @return
+	 */
+	public static boolean AABB_AABBIntersect(Vec3 a_min, Vec3 a_max, Vec3 b_min, Vec3 b_max) {
+		boolean xint = (a_min.x <= b_min.x && b_min.x <= a_max.x) || (b_min.x <= a_min.x && a_min.x <= b_max.x);
+		boolean yint = (a_min.y <= b_min.y && b_min.y <= a_max.y) || (b_min.y <= a_min.y && a_min.y <= b_max.y);
+		boolean zint = (a_min.z <= b_min.z && b_min.z <= a_max.z) || (b_min.z <= a_min.z && a_min.z <= b_max.z);
+		return xint && yint && zint;
 	}
 
 	/**
@@ -1510,6 +1521,11 @@ public class MathUtils {
 			return new float[] { n, m };
 		}
 
+		//TODO handle the case in which they are exactly parallel
+		if (MathUtils.cross(d0, d1).lengthSq() == 0) {
+			//TODO
+		}
+
 		float n = 0;
 		float m = 0;
 
@@ -1895,13 +1911,13 @@ public class MathUtils {
 	 * @param bb_max
 	 * @return
 	 */
-	public static Vec3 ray_boundingBoxIntersect(Vec3 ray_origin, Vec3 ray_dir, Vec3 bb_min, Vec3 bb_max) {
+	public static Vec3 ray_AABBIntersect(Vec3 ray_origin, Vec3 ray_dir, Vec3 bb_min, Vec3 bb_max) {
 		float[] dir_component = new float[] { ray_dir.x, ray_dir.y, ray_dir.z };
 		float[] pos_component = new float[] { ray_origin.x, ray_origin.y, ray_origin.z };
 		float[] min_component = new float[] { bb_min.x, bb_min.y, bb_min.z };
 		float[] max_component = new float[] { bb_max.x, bb_max.y, bb_max.z };
 		boolean did_hit = false;
-		boolean inside_box = pointInsideBoundingBox(ray_origin, bb_min, bb_max);
+		boolean inside_box = pointInsideAABB(ray_origin, bb_min, bb_max);
 		float hit_dist = (float) 1e9; //some large number
 		for (int i = 0; i < 3; i++) {
 			if (dir_component[i] == 0) {
@@ -1911,7 +1927,7 @@ public class MathUtils {
 			float dist = tgt - pos_component[i];
 			float ray_mul = dist / dir_component[i];
 			Vec3 test_pos = ray_origin.add(ray_dir.mul(ray_mul));
-			if (pointInsideBoundingBox(test_pos, bb_min, bb_max) && ray_mul >= 0) {
+			if (pointInsideAABB(test_pos, bb_min, bb_max) && ray_mul >= 0) {
 				did_hit = true;
 				hit_dist = Math.min(hit_dist, ray_mul);
 			}

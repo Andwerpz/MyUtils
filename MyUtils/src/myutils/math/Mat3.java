@@ -72,6 +72,21 @@ public class Mat3 {
 		return new Mat3(this).muli(m);
 	}
 
+	public Mat3 muli(float s) {
+		Mat3 result = new Mat3();
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				result.mat[i][j] = this.mat[i][j] * s;
+			}
+		}
+		this.set(result);
+		return this;
+	}
+
+	public Mat3 mul(float s) {
+		return new Mat3(this).muli(s);
+	}
+
 	public Vec3 mul(Vec3 v) {
 		Vec3 ret = new Vec3(0);
 		ret.x = mat[0][0] * v.x + mat[0][1] * v.y + mat[0][2] * v.z;
