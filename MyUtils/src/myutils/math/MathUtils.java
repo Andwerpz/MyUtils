@@ -399,6 +399,44 @@ public class MathUtils {
 
 		return v1.mul((float) (Math.sin((1 - t) * omega) / Math.sin(omega))).add(v2.mul((float) (Math.sin(t * omega) / Math.sin(omega))));
 	}
+	
+	/**
+	 * Linear interpolation of rotation quaternions where t is 0 to 1. 
+	 * 
+	 * q1, q2 need to be unit quaternions for this to work.
+	 * 
+	 * (q1^{-1} q2) represents rotation from q1 -> q2, then take it to the power t and multiply it with q1. 
+	 * @param q1
+	 * @param q2
+	 * @param t
+	 * @return
+	 */
+	public static Quaternion slerp(Quaternion q1, Quaternion q2, float t) {
+		// If the dot product is negative, the quaternions have opposite handedness
+	    // and slerp won't take the shorter path. So invert one quaternion.
+		float dot = q1.s * q2.s + q1.i * q2.i + q1.j * q2.j + q1.k * q2.k;
+		if (dot < 0.0f) {
+	        q2 = new Quaternion(-q2.s, -q2.i, -q2.j, -q2.k);
+	        dot = -dot;
+	    }
+		Quaternion tmp = q1.inv().mul(q2);
+		tmp.powi(t);
+		return q1.mul(tmp);
+	}
+	
+	/**
+	 * Linear interpolation of rotation quaternions. q1, q2 need to be unit quaternions for this to work.
+	 * @param q1
+	 * @param t1
+	 * @param q2
+	 * @param t2
+	 * @param t
+	 * @return
+	 */
+	public static Quaternion slerp(Quaternion q1, float t1, Quaternion q2, float t2, float t) {
+		t = (t - t1) / (t2 - t1);	//normalize to [0, 1]
+		return slerp(q1, q2, t);
+	}
 
 	// -- QUATERNIONS --
 

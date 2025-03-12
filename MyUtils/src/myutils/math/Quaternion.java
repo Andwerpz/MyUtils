@@ -120,6 +120,53 @@ public class Quaternion {
 		this.set(this.div(a));
 		return this;
 	}
+	
+	public Quaternion expi() {
+		float r = (float) Math.sqrt(this.i * this.i + this.j * this.j + this.k * this.k);
+		float et = (float) Math.exp(this.s);
+		float s = r >= 0.00001f? et * (float) Math.sin(r) / r : 0.0f;
+		
+		this.s = et * (float) Math.cos(r);
+		this.i *= s;
+		this.j *= s;
+		this.k *= s;
+		return this;
+	}
+	
+	public Quaternion exp() {
+		return new Quaternion(this).expi();
+	}
+
+	public Quaternion lni() {
+		float r = (float) Math.sqrt(this.i * this.i + this.j * this.j + this.k * this.k);
+		float t = r > 0.00001f? (float) Math.atan2(r, this.s) / r : 0.0f;
+		
+		this.s = 0.5f * (float) Math.log(this.s * this.s + this.i * this.i + this.j * this.j + this.k * this.k);
+		this.i *= t;
+		this.j *= t;
+		this.k *= t;
+		return this;
+	}
+	
+	public Quaternion ln() {
+		return new Quaternion(this).lni();
+	}
+	
+	/**
+	 * Only makes sense for unit rotation quaternions. 
+	 * @param n
+	 * @return
+	 */
+	public Quaternion powi(float n){
+		this.lni();
+		this.muli(n);
+		this.expi();
+	    return this;
+	}
+	
+	public Quaternion pow(float n) {
+		return new Quaternion(this).powi(n);
+	}
 
 	public void normalize() {
 		this.divi(this.length());
