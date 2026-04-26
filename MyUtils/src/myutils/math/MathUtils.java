@@ -449,7 +449,7 @@ public class MathUtils {
 	public static Quaternion quaternionRotationUToV(Vec3 u, Vec3 v) {
 		Vec3 a = u.cross(v);
 		Quaternion ret = new Quaternion();
-		ret.s = (float) Math.sqrt(u.lengthSq() + v.lengthSq()) + u.dot(v);
+		ret.s = (float) Math.sqrt(u.lengthSq() * v.lengthSq()) + u.dot(v);
 		ret.i = a.x;
 		ret.j = a.y;
 		ret.k = a.z;
