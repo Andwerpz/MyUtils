@@ -482,7 +482,7 @@ public class MathUtils {
 	 */
 	public static Vec3 quaternionRotateVec3(Quaternion q, Vec3 v) {
 		Quaternion qv = new Quaternion(0, v.x, v.y, v.z);
-		qv = q.mul(qv).mul(q.inv());
+		qv = q.mul(qv).mul(q.conjugate());
 		return new Vec3(qv.i, qv.j, qv.k);
 	}
 

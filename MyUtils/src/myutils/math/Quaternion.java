@@ -4,8 +4,16 @@ import java.util.StringTokenizer;
 
 public class Quaternion {
 
-	//in order to utilize this to represent 3D rotations, s is theta, and i, j, k, is the unit vector
-	//that is the axis of rotation. 
+	//suppose that you wanted to represent a rotation of \theta around unit axis (x, y, z). Then,
+	//s = cos(\theta / 2)
+	//i = x * sin(\theta / 2)
+	//j = y * sin(\theta / 2)
+	//k = z * sin(\theta / 2)
+	
+	//to compose two quaternions, you can just multiply them together
+	//to apply the quaternion rotation q onto a vector v, you need to compute
+	// qvq*
+	//where q* is the conjugate of q
 
 	public float s, i, j, k;
 

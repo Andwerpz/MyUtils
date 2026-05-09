@@ -13,6 +13,9 @@ import javax.imageio.ImageIO;
 public class JarUtils {
 	//for now, this is mainly to load files that are packaged as a part of a jar. 
 	//instead of loading files, and then interpreting them, we load input streams and then interpret them. 
+	
+	//filepaths are all relative to the 'res' directory. For example, if you want to load 'astolfo 11.jpg', then
+	//you'd call loadImage("/astolfo 11.jpg");
 
 	/**
 	 * Loads file from resource package as input stream. 
